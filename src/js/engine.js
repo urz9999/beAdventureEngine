@@ -31,6 +31,8 @@ class beAdventureEngine {
             showInventory: false,
             showIntermission: false,
 
+            doingQuestion: false,
+
             blockMouseAction: false,
             processInteractable: false,
             walkingToInteractable: false,
@@ -114,6 +116,15 @@ class beAdventureEngine {
             // For interactable of type trigger
             if(this.spriteManager.imageExists(`assets/images/ui/objects/${obj.name}ON.png`)) {
                 this.spriteManager.readSprite(`${obj.name}ON`, `assets/images/ui/objects/${obj.name}ON.png`);
+            }
+        }
+
+        // Load prize for questions
+        const questions = map.interactables.filter(int => int.type === 'question');
+        for(let i = 0; i < questions.length; i++) {
+            const objects = questions[i].question.result.filter(r => r.object !== undefined);
+            for(let j = 0; j < objects.length; j++) {
+                this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
             }
         }
 
@@ -284,6 +295,62 @@ class beAdventureEngine {
         ) {
             // Ok is time to show the question dialog?
             const questionData = this.gameVariables.questions[this.gameVariables.currentInteractable.linked];
+            if (questionData && questionData.isRespondingToQuestion) {
+                const questionBG = this.spriteManager.getSprite('Question');
+                ctx.drawImage(questionBG.graphics, this.gameWidth / 2 - questionBG.width / 2, this.gameHeight / 2 - questionBG.height / 2);
+
+                const questionName = this.gameVariables.currentInteractable.question.name;
+                this.fontManager.drawText(
+                    this.gameCanvas, 380, questionName,
+                    this.gameWidth / 2 - questionBG.width / 2 + 60, this.gameHeight / 2 - questionBG.height / 2 + 30,
+                    'starmap', 'white'
+                );
+
+                const questionText = this.gameVariables.currentInteractable.question.text;
+                const textHeight = this.fontManager.drawText(
+                    this.gameCanvas, 380, questionText,
+                    this.gameWidth / 2 - questionBG.width / 2 + 60, this.gameHeight / 2 - questionBG.height / 2 + 80,
+                    'starmap', 'white'
+                );
+
+                const answers = this.gameVariables.currentInteractable.question.answers;
+                let answerOffset = 0;
+
+                for(let i = 0; i < answers.length; i++) {
+                    const text = answers[i].text;
+
+                    this.fontManager.drawText(
+                        this.gameCanvas, 380, `${i+1})`,
+                        this.gameWidth / 2 - questionBG.width / 2 + 60,
+                        this.gameHeight / 2 - questionBG.height / 2 + 90 + textHeight + i * 10 + answerOffset,
+                        'starmap', '#23c6e7'
+                    )
+
+                    const heightOfBbox = this.fontManager.drawText(
+                        this.gameCanvas, 380, text,
+                        this.gameWidth / 2 - questionBG.width / 2 + 80,
+                        this.gameHeight / 2 - questionBG.height / 2 + 90 + textHeight + i * 10 + answerOffset,
+                        'starmap', 'white'
+                    );
+
+                    if(questionData.boundingBoxes.length < answers.length) {
+                        questionData.boundingBoxes.push({
+                            x: this.gameWidth / 2 - questionBG.width / 2 + 60 - 3,
+                            y: this.gameHeight / 2 - questionBG.height / 2 + 75 + textHeight + i * 10 + answerOffset - 3,
+                            width: 386,
+                            height: heightOfBbox + 3
+                        });
+                    }
+
+                    answerOffset += heightOfBbox;
+                }
+
+                if(questionData.answeredQuestionNumber > -1) {
+                    const boundingBox = questionData.boundingBoxes[questionData.answeredQuestionNumber];
+                    ctx.fillStyle = "rgba(0,0,0,0.3)";
+                    ctx.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                }
+            }
         }
 
         // Ui - Semi opacque background
@@ -301,12 +368,12 @@ class beAdventureEngine {
             const overallSpaceX = inventorySlot.width * 4 + 60;
             const overallSpaceY = inventorySlot.height * 4 + 60;
 
-            for(let j = 0; j < 4; j++) {
-                for(let i = 0; i < 4; i++) {
+            for(let i = 0; i < 4; i++) {
+                for(let j = 0; j < 4; j++) {
                     let obj = this.gameVariables.inventory[i * 4 + j];
 
-                    const slotX = this.gameWidth / 2 - overallSpaceX / 2 + i * inventorySlot.width + i * 20;
-                    const slotY = this.gameHeight / 2 - overallSpaceY / 2 + j * inventorySlot.height + j * 20;
+                    const slotX = this.gameWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
+                    const slotY = this.gameHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
 
                     ctx.drawImage(inventorySlot.graphics, slotX, slotY);
 
@@ -326,8 +393,8 @@ class beAdventureEngine {
                 const tooltipOffsetY = this.gameVariables.inventoryTooltip.index < 3 ? this.gameVariables.inventoryTooltip.index * inventorySlot.height + this.gameVariables.inventoryTooltip.index * 10 : 0;
                 ctx.drawImage(tooltip.graphics, this.gameWidth / 2 - tooltip.width / 2, this.gameHeight / 2 - tooltip.height / 2 + tooltipOffsetY - 30);
                 const tooltipTextX = this.gameWidth / 2 - tooltip.width / 2 + 50;
-                const tooltipTextY = this.gameHeight / 2 - tooltip.height / 2 + 30;
-                this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY - 30, 'starmap', 'white');
+                const tooltipTextY = this.gameHeight / 2 - tooltip.height / 2;
+                this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white');
             }
         }
 

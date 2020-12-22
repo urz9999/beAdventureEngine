@@ -9,6 +9,7 @@
       "width": 76,
       "height": 84,
       "question": {
+        "name": "Eri Kasamoto",
         "text": "Qual'è la risposta giusta a tutti i quesiti che possono mai essere posti a questo mondo? Soprattutto quando c'è di mezzo il mondo del Cloud! Pensa bene e seleziona la risposta giusta!",
         "answers": [
           { "text": "Mannaggia il cane mi ha mangiato il compito in classe!", "valid":  0 },

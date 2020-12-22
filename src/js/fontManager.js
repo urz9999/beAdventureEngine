@@ -52,6 +52,7 @@ class FontManager {
         if(idx > 0) {
             this.drawOrStroke(ctx, words.join(' '), x, y + (lineHeight * currentLine), fill);
         }
+        return lineHeight * (currentLine + 1);
     }
 
     drawOrStroke(ctx, text, x, y, fill) {

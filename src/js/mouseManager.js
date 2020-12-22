@@ -30,7 +30,7 @@ class MouseManager {
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
 
-        if(!this.gameStatus.showInventory) {
+        if(!this.gameStatus.showInventory && !this.gameStatus.doingQuestion) {
             const foundInteractable = this.overInteractable(canvasX, canvasY);
             if(foundInteractable !== null) {
                 switch (foundInteractable.type) {
@@ -47,15 +47,19 @@ class MouseManager {
                 this.gameVariables.interactableAuraOn = null;
             }
         } else {
-            // Check if the mouse is over some element of the inventory
-            const index = this.overMenuSlot(canvasX, canvasY);
-            if(index > -1) {
-                let obj = this.gameVariables.inventory[index];
-                if(obj !== undefined) {
-                    this.gameVariables.inventoryTooltip = { tooltip: obj.description, index: index / 4 };
+            if(!this.gameStatus.doingQuestion) {
+                // Check if the mouse is over some element of the inventory
+                const index = this.overMenuSlot(canvasX, canvasY);
+                if(index > -1) {
+                    let obj = this.gameVariables.inventory[index];
+                    if(obj !== undefined) {
+                        this.gameVariables.inventoryTooltip = { tooltip: obj.description, index: Math.floor(index / 4) };
+                    }
+                } else {
+                    this.gameVariables.inventoryTooltip = null;
                 }
             } else {
-                this.gameVariables.inventoryTooltip = null;
+                this.gameVariables.questions[this.gameVariables.currentInteractable.linked].answeredQuestionNumber = this.overQuestion(canvasX, canvasY);
             }
         }
     }
@@ -74,6 +78,15 @@ class MouseManager {
             this.gameStatus.showInventory = !this.gameStatus.showInventory;
             if(this.gameStatus.showInventory) {
                 this.gameStatus.cursor = 'standard';
+            }
+            return;
+        }
+
+        // Process questions
+        if(this.gameStatus.doingQuestion) {
+            if(this.gameVariables.questions[this.gameVariables.currentInteractable.linked].answeredQuestionNumber > -1) {
+                this.interactableManager.processClicksForEvents();
+                this.gameStatus.blockMouseAction = false;
             }
             return;
         }
@@ -154,14 +167,14 @@ class MouseManager {
         for(let j = 0; j < 4; j++) {
             for(let i = 0; i < 4; i++) {
 
-                const slotX = this.gameCanvas.parentElement.clientWidth / 2 - overallSpaceX / 2 + i * inventorySlot.width + i * 20;
-                const slotY = this.gameCanvas.parentElement.clientHeight / 2 - overallSpaceY / 2 + j * inventorySlot.height + j * 20;
+                const slotX = this.gameCanvas.parentElement.clientWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
+                const slotY = this.gameCanvas.parentElement.clientHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
 
                 if(
                     canvasX > slotX && canvasX < (slotX + inventorySlot.width) &&
                     canvasY > slotY && canvasY < (slotY + inventorySlot.height)
                 ) {
-                    return i * 4 + j;
+                    return (i * 4 + j);
                 }
             }
         }
@@ -180,5 +193,24 @@ class MouseManager {
             }
         }
         return null;
+    }
+
+    overQuestion(canvasX, canvasY) {
+        const questionData = this.gameVariables.questions[this.gameVariables.currentInteractable.linked];
+
+        if(questionData !== undefined && questionData.boundingBoxes !== undefined) {
+            for(let i = 0; i < questionData.boundingBoxes.length; i++) {
+                const boundingBox = questionData.boundingBoxes[i];
+                console.log(canvasX, canvasY, boundingBox);
+                if(
+                    canvasX > boundingBox.x && canvasX < (boundingBox.x + boundingBox.width) &&
+                    canvasY > boundingBox.y && canvasY < (boundingBox.y + boundingBox.height)
+                ) {
+                    console.log('return ', i);
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }

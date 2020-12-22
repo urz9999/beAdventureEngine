@@ -39,6 +39,7 @@ class InteractableManager {
                 giveKomessage: false,
                 giveTrigger: false,
                 answeredQuestionNumber: -1,
+                boundingBoxes: []
             };
         }
 
@@ -55,6 +56,8 @@ class InteractableManager {
                 questionData.correctAnswer = false;
                 questionData.giveOkMessage = false;
                 questionData.giveKomessage = false;
+
+                this.gameStatus.doingQuestion = true;
             });
         } else if(
             !questionData.isRespondingToQuestion &&
@@ -62,7 +65,10 @@ class InteractableManager {
             !questionData.giveOkMessage &&
             !questionData.giveKomessage
         ) {
-            this.processDialog(this.gameVariables.currentInteractable.completedMessages, () => {});
+            this.processDialog(this.gameVariables.currentInteractable.completedMessages, () => {
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
+            });
         } else if(
             !questionData.isRespondingToQuestion &&
             !questionData.correctAnswer &&
@@ -74,10 +80,14 @@ class InteractableManager {
                 questionData.isRespondingToQuestion = false;
                 questionData.giveOkMessage = false;
                 questionData.giveKomessage = false;
+
                 if(!questionData.giveTrigger) {
                     questionData.giveTrigger = true;
                     this.processRewardToQuestion();
                 }
+
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
             });
         } else if(
             !questionData.isRespondingToQuestion &&
@@ -90,6 +100,9 @@ class InteractableManager {
                 questionData.isRespondingToQuestion = false;
                 questionData.giveOkMessage = false;
                 questionData.giveKomessage = false;
+
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
             });
         }
     }
@@ -102,7 +115,7 @@ class InteractableManager {
                 case 'look': this.incrementMessageIndex(); break;
                 case 'object': this.incrementMessageIndex(); break;
                 case 'interact': this.incrementMessageIndex(); break;
-                case 'questions': this.incrementMessageIndexOrRespond(); break;
+                case 'question': this.incrementMessageIndexOrRespond(); break;
             }
         }
     }
@@ -147,11 +160,17 @@ class InteractableManager {
         const messages = mess;
         const currentMessageToShow = this.gameVariables.currentInteractable.messageIndex || 0;
         if(currentMessageToShow === (messages.length)) {
-            // finish: remove interactable
-            this.gameVariables.currentInteractable = null;
-            this.gameStatus.processInteractable = false;
+            // finish: remove interactable only if not question or question is at the end, in that case we handle it safely from its processor callback
+            this.gameVariables.currentInteractable.messageIndex = 0;
+
+            if(this.gameVariables.currentInteractable.type !== 'question') {
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
+            }
+
             this.gameVariables.currentDialog = null;
             this.gameVariables.player.animation = 'idle';
+
             if(callback !== undefined) {
                 callback();
             }
@@ -200,6 +219,8 @@ class InteractableManager {
             questionData.giveOkMessage = (answered === corretOneIndex);
             questionData.giveKomessage = !questionData.giveOkMessage;
             questionData.isRespondingToQuestion = false;
+
+            this.gameStatus.doingQuestion = false;
         }
     }
 
@@ -213,16 +234,16 @@ class InteractableManager {
     }
 
     processRewardToQuestion() {
-        const trigger = this.gameVariables.currentInteractable.question.result.trigger;
-        const object = this.gameVariables.currentInteractable.question.result.object;
-        if(trigger !== undefined) {
-            this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
-        }
-        if(object !== undefined) {
-            if(this.gameVariables.inventory.filter(obj => obj.name === object.name).length === 0) {
-                this.gameVariables.inventory.push(
-                    { name: object.name, description: object.description }
-                );
+        for(let i = 0; i < this.gameVariables.currentInteractable.question.result.length; i++) {
+            const trigger = this.gameVariables.currentInteractable.question.result[i].trigger;
+            const object = this.gameVariables.currentInteractable.question.result[i].object;
+            if(trigger !== undefined) {
+                this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
+            }
+            if(object !== undefined) {
+                if(this.gameVariables.inventory.filter(obj => obj.name === object.name).length === 0) {
+                    this.gameVariables.inventory.push({ name: object.name, description: object.description });
+                }
             }
         }
     }
