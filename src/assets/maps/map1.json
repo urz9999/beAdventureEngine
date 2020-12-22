@@ -1,0 +1,236 @@
+{
+  "name": "Exterior World",
+  "interactables": [
+    {
+      "type": "question",
+      "linked": "eri",
+      "x": 890,
+      "y": 353,
+      "width": 76,
+      "height": 84,
+      "question": {
+        "text": "Qual'è la risposta giusta a tutti i quesiti che possono mai essere posti a questo mondo? Soprattutto quando c'è di mezzo il mondo del Cloud! Pensa bene e seleziona la risposta giusta!",
+        "answers": [
+          { "text": "Mannaggia il cane mi ha mangiato il compito in classe!", "valid":  0 },
+          { "text": "42", "valid":  0 },
+          { "text": "che domande: beSharp con AWS!", "valid":  1 },
+          { "text": "Sei tu un dio? No? Allora muori!", "valid":  0 }
+        ],
+        "result": [
+          { "trigger": 1 },
+          { "object": { "name": "money", "description": "un pacco di soldi fruscianti per te!" } }
+        ]
+      },
+      "messages": [
+        {
+          "type": "other",
+          "name": "Eri Kasamoto",
+          "portrait": "eri",
+          "text": "Salve, sono Eri da Metal Slug! Hai presente?"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Salve, ehm forse si? Massì dai! Dicame!"
+        },
+        {
+          "type": "other",
+          "name": "Eri Kasamoto",
+          "portrait": "eri",
+          "text": "Sto per farti provare il sistema a domande! Ora vado!"
+        }
+      ],
+      "goodAnswerMessages": [
+        {
+          "type": "other",
+          "name": "Eri Kasamoto",
+          "portrait": "eri",
+          "text": "Ottima risposta! ecco dei soldi come premio."
+        }
+      ],
+      "wrongAnswerMessages": [
+        {
+          "type": "other",
+          "name": "Eri Kasamoto",
+          "portrait": "eri",
+          "text": "Sbagliato buuuh. Ritenta!"
+        }
+      ],
+      "completedMessages": [
+        {
+          "type": "other",
+          "name": "Eri Kasamoto",
+          "portrait": "eri",
+          "text": "Alla prossima! Stammi bene."
+        }
+      ]
+    },
+    {
+      "type": "interact",
+      "linked": "lever",
+      "trigger": "toggle",
+      "x": 430,
+      "y": 410,
+      "width": 41,
+      "height": 24,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ora tiro la Leva!"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "description": "una pozione misteriosa trovata sul terreno",
+      "linked": "potion",
+      "x": 780,
+      "y": 405,
+      "width": 20,
+      "height": 28,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Una pozione! Mi servirà!"
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "linked": "crow",
+      "x": 180,
+      "y": 405,
+      "width": 32,
+      "height": 32,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Un corvo che più nero non si può!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Uhm, forse qua in giro c'è Brandon Lee! Un mistero eh! Un abbraccio...Adam!"
+        }
+      ]
+    },
+    {
+      "type": "dialog",
+      "linked": "monster",
+      "x": 570,
+      "y": 365,
+      "width": 86,
+      "height": 72,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Che diamine di animale sei?"
+        },
+        {
+          "type": "other",
+          "name": "Hell monster",
+          "portrait": "monster",
+          "text": "Sono un mostro dell'inferno!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ah si? Figata!"
+        }
+      ]
+    },
+    {
+      "type": "dialog",
+      "linked": "monkey",
+      "width": 40,
+      "height": 36,
+      "x": 1200,
+      "y": 400,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ma si possono usare anche delle variabili nel testo?"
+        },
+        {
+          "type": "other",
+          "name": "Scimmia super saggia",
+          "portrait": "monkey",
+          "text": "Assolutamente si!! Usa ${} con dentro NAME per avere il valore del trigger."
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Sul serio? Ma dai! Cioè, che storia! 'Sto framework è troppo figo!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Quindi posso fare così: ${lever}!"
+        }
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "name": "monster",
+      "sWidth": 86,
+      "frames": 4,
+      "x": 570,
+      "y": 365
+    },
+    {
+      "name": "crow",
+      "sWidth": 32,
+      "frames": 4,
+      "x": 180,
+      "y": 405
+    },
+    {
+      "name": "monkey",
+      "sWidth": 40,
+      "frames": 10,
+      "x": 1200,
+      "y": 400
+    },
+    {
+      "name": "eri",
+      "sWidth": 76,
+      "frames": 6,
+      "x": 890,
+      "y": 353
+    }
+  ],
+  "objects": [
+    {
+      "name": "potion",
+      "x": 780,
+      "y": 405
+    },
+    {
+      "name": "lever",
+      "x": 430,
+      "y": 410
+    }
+  ],
+  "bg_R_offset": -50,
+  "bg_M_offset": -50,
+  "bg_F_offset": -100,
+  "startingPoint": [50, 350],
+  "startingMusic": "8-Bit-Perplexion.mp3",
+  "walkableOffset": 0
+}

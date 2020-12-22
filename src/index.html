@@ -1,0 +1,36 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>beSharp and the lost key of the CED</title>
+  <meta name="description" content="simple point & click adventure">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div><canvas id="game"></canvas></div>
+
+  <script src="js/settings.js"></script>
+  <script src="js/soundsSystem.js"></script>
+  <script src="js/spriteManager.js"></script>
+  <script src="js/fontManager.js"></script>
+  <script src="js/mouseManager.js"></script>
+  <script src="js/interactableManager.js"></script>
+  <script src="js/mapManager.js"></script>
+  <script src="js/engine.js"></script>
+
+  <script>
+    const game = new beAdventureEngine("game");
+    game.start(1);
+  </script>
+</body>
+
+</html>
