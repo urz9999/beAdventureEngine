@@ -32,6 +32,7 @@ class beAdventureEngine {
             showIntermission: false,
 
             doingQuestion: false,
+            gamePaused: false,
 
             blockMouseAction: false,
             processInteractable: false,
@@ -41,7 +42,7 @@ class beAdventureEngine {
         };
 
         this.gameVariables = {
-            player: { direction: 1, animation: 'idle', reachX: 0 },
+            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false },
             objects: [],
             characters: [],
             inventory: [],
@@ -60,104 +61,22 @@ class beAdventureEngine {
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables);
-        this.mapManager = new MapManager();
-        this.interactableManager = new InteractableManager(this.spriteManager, this.gameStatus, this.gameVariables, this.gameCanvas);
+        this.mapManager = new MapManager(this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
+        this.interactableManager = new InteractableManager(this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
+
+
     }
 
     start(number) {
         // ==== Pre load general data here... ==================
         this.fontManager.addFont('starmap', { color: 'white', size: 18 });
 
-        this.loadLevel(number);
-
+        this.mapManager.loadLevel(number);
         requestAnimationFrame((time) => this.gameLoop(time));
     }
 
-    startLevel() {
-        this.soundSystem.playBackgroundMusic(this.gameVariables.currentMusic);
-    }
 
-    async loadLevel(number) {
-        // 0 loading // 1 playing // 2 menu // 3 intermission // etc...
-        this.gameStatus.levelStatus = 0;
-
-        const map = await this.mapManager.loadMap(`map${number}`);
-
-        this.gameVariables.currentMap = number;
-        this.gameVariables.currentMusic = map.startingMusic;
-
-        // Load background
-        this.spriteManager.readSprite('BG_R', `assets/images/maps/map${number}/map${number}_R.png`);
-        this.spriteManager.readSprite('BG_M', `assets/images/maps/map${number}/map${number}_M.png`);
-        this.spriteManager.readSprite('BG_F', `assets/images/maps/map${number}/map${number}_F.png`);
-
-        // Load UI
-        this.spriteManager.readSprite('InventoryIcon', `assets/images/ui/menu/inventory.png`);
-        this.spriteManager.readSprite('InventorySlot', `assets/images/ui/menu/inventorySlot.png`);
-        this.spriteManager.readSprite('DialogBox', `assets/images/ui/menu/dialog.png`);
-        this.spriteManager.readSprite('Tooltip', `assets/images/ui/menu/tooltip.png`);
-        this.spriteManager.readSprite('Question', `assets/images/ui/menu/question.png`);
-
-        // Load main character
-        this.spriteManager.readMainCharacter();
-
-        // Load other characters
-        for(let i = 0; i < map.characters.length; i++) {
-            const char = map.characters[i];
-            this.spriteManager.readAnimatedCharacter(char.name, `assets/images/ui/pgs/${char.name}.png`, char.sWidth, char.frames);
-        }
-
-        // Load objects
-        for(let i = 0; i < map.objects.length; i++) {
-            const obj = map.objects[i];
-            this.spriteManager.readSprite(obj.name, `assets/images/ui/objects/${obj.name}.png`);
-
-            // For interactable of type trigger
-            if(this.spriteManager.imageExists(`assets/images/ui/objects/${obj.name}ON.png`)) {
-                this.spriteManager.readSprite(`${obj.name}ON`, `assets/images/ui/objects/${obj.name}ON.png`);
-            }
-        }
-
-        // Load prize for questions
-        const questions = map.interactables.filter(int => int.type === 'question');
-        for(let i = 0; i < questions.length; i++) {
-            const objects = questions[i].question.result.filter(r => r.object !== undefined);
-            for(let j = 0; j < objects.length; j++) {
-                this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
-            }
-        }
-
-        // Set game variables to map data
-        this.gameVariables.objects = map.objects;
-        this.gameVariables.characters = map.characters;
-        this.gameVariables.interactables = map.interactables;
-        this.gameVariables.player = { direction: true, animation: 'idle' }
-
-        // Load all textures
-        const waiter = setInterval(() => {
-            if(this.spriteManager.allSpriteLoaded()) {
-                // Set main position
-                this.spriteManager.getSprite('main').setCoords(map.startingPoint[0], map.startingPoint[1]);
-
-                // Set character position
-                for(let i = 0; i < map.characters.length; i++) {
-                    const char = map.characters[i];
-                    this.spriteManager.getSprite(char.name).setCoords(char.x, char.y);
-                }
-
-                // Set objects position
-                for(let i = 0; i < map.objects.length; i++) {
-                    const obj = map.objects[i];
-                    this.spriteManager.getSprite(obj.name).setCoords(obj.x, obj.y);
-                }
-
-                this.gameStatus.levelStatus = 1;
-                this.startLevel();
-                clearInterval(waiter);
-            }
-        }, 500);
-    }
 
     gameLoop(time) {
         requestAnimationFrame((time) => this.gameLoop(time));
@@ -177,7 +96,7 @@ class beAdventureEngine {
 
         // ==== Animation Operation: including user inputs and interactions =====
         switch (this.gameStatus.levelStatus) {
-            case 0: break;
+            case 0: this.animateLoader(); break;
             case 1: this.animateMap(); break;
         }
 
@@ -207,8 +126,16 @@ class beAdventureEngine {
     }
 
     drawLoader() {
+        this.gameCanvas.getContext('2d').fillStyle = "#000000";
         this.gameCanvas.getContext('2d').fillRect(0, 0, this.gameWidth, this.gameHeight);
-        this.fontManager.drawText(this.gameCanvas, 200, 'Loading Map data...', this.gameWidth / 2 - 100, this.gameHeight/ 2 - 100, 'starmap', '#691dc1');
+        const loading = this.spriteManager.getSprite('Loading');
+        if(loading !== undefined) {
+            this.gameCanvas.getContext('2d').drawImage(
+                loading.graphics,
+                loading.subSprite.sx, loading.subSprite.sy, loading.subSprite.width, loading.subSprite.height,
+                this.gameWidth / 2 - 200, this.gameHeight / 2 - 150, loading.subSprite.width, loading.subSprite.height
+            )
+        }
     }
 
     drawMap() {
@@ -220,8 +147,22 @@ class beAdventureEngine {
         // Backgrounds
         const bgR = this.spriteManager.getSprite('BG_R');
         const bgM = this.spriteManager.getSprite('BG_M');
-        ctx.drawImage(bgR.graphics, bgR.getCoords().x, bgR.getCoords().y + this.mapManager.map.bg_R_offset, bgR.width * bgR.scale, bgR.height * bgR.scale);
-        ctx.drawImage(bgM.graphics, bgM.getCoords().x, bgM.getCoords().y + this.mapManager.map.bg_M_offset, bgM.width * bgM.scale, bgM.height * bgM.scale);
+        ctx.drawImage(bgR.graphics, bgR.getCoords().x, bgR.getCoords().y + this.mapManager.map.bg_R_offset, bgR.width, bgR.height);
+        ctx.drawImage(bgM.graphics, bgM.getCoords().x, bgM.getCoords().y + this.mapManager.map.bg_M_offset, bgM.width, bgM.height);
+
+        // Characters
+        for(let i = 0; i < this.gameVariables.characters.length; i++) {
+            const name = this.gameVariables.characters[i].name;
+            const char = this.spriteManager.getSprite(name);
+            if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) {
+
+            }
+            ctx.drawImage(
+                char.graphics,
+                char.subSprite.sx, char.subSprite.sy, char.subSprite.width, char.subSprite.height,
+                char.subSprite.dx, char.subSprite.dy, char.subSprite.width, char.subSprite.height
+            );
+        }
 
         // Objects
         for(let i = 0; i < this.gameVariables.objects.length; i++) {
@@ -234,40 +175,28 @@ class beAdventureEngine {
             const trigger = this.gameVariables.triggers[name];
             if(trigger !== undefined) {
                 if(trigger === 0 || objON === undefined) {
-                    ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y);
+                    ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
                 } else {
-                    ctx.drawImage(objON.graphics, obj.getCoords().x, obj.getCoords().y);
+                    ctx.drawImage(objON.graphics, obj.getCoords().x, obj.getCoords().y, objON.width, objON.height);
                 }
             } else {
-                ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y);
+                ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
             }
-        }
-
-        // Characters
-        for(let i = 0; i < this.gameVariables.characters.length; i++) {
-            const name = this.gameVariables.characters[i].name;
-            const char = this.spriteManager.getSprite(name);
-            if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) {
-
-            }
-            ctx.drawImage(
-                char.graphics,
-                char.subSprite.sx, char.subSprite.sy, char.subSprite.width * char.scale, char.subSprite.height * char.scale,
-                char.subSprite.dx, char.subSprite.dy, char.subSprite.width * char.scale, char.subSprite.height * char.scale
-            );
         }
 
         // Player
-        const player = this.spriteManager.getSprite('main');
-        ctx.drawImage(
-            player.graphics,
-            player.subSprite.sx, player.subSprite.sy, player.subSprite.width * player.scale, player.subSprite.height * player.scale,
-            player.subSprite.dx, player.subSprite.dy, player.subSprite.width * player.scale, player.subSprite.height * player.scale
-        );
+        if (this.gameVariables.player.noplayer === false) {
+            const player = this.spriteManager.getSprite('main');
+            ctx.drawImage(
+                player.graphics,
+                player.subSprite.sx, player.subSprite.sy, player.subSprite.width, player.subSprite.height,
+                player.subSprite.dx, player.subSprite.dy, player.subSprite.width, player.subSprite.height
+            );
+        }
 
         // Foreground
         const bgF = this.spriteManager.getSprite('BG_F');
-        ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + this.mapManager.map.bg_F_offset, bgF.width * bgF.scale, bgF.height * bgF.scale);
+        ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + this.mapManager.map.bg_F_offset, bgF.width, bgF.height);
 
         // Ui - Dialog Box
         if(this.gameVariables.currentDialog !== null) {
@@ -353,52 +282,62 @@ class beAdventureEngine {
             }
         }
 
-        // Ui - Semi opacque background
-        if (this.gameStatus.showInventory) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
-        }
-
-        // Ui - Inventory
-        const inventoryIcon = this.spriteManager.getSprite('InventoryIcon');
-        const inventorySlot = this.spriteManager.getSprite('InventorySlot');
-        ctx.drawImage(inventoryIcon.graphics, this.gameWidth - inventoryIcon.width - 20, 20);
-
-        if (this.gameStatus.showInventory) {
-            const overallSpaceX = inventorySlot.width * 4 + 60;
-            const overallSpaceY = inventorySlot.height * 4 + 60;
-
-            for(let i = 0; i < 4; i++) {
-                for(let j = 0; j < 4; j++) {
-                    let obj = this.gameVariables.inventory[i * 4 + j];
-
-                    const slotX = this.gameWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
-                    const slotY = this.gameHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
-
-                    ctx.drawImage(inventorySlot.graphics, slotX, slotY);
-
-                    if(obj !== undefined) {
-                        obj = this.spriteManager.getSprite(obj.name);
-                        const objX = slotX + inventorySlot.width / 2 - obj.width / 2;
-                        const objY = slotY + inventorySlot.height / 2 - obj.height / 2;
-
-                        ctx.drawImage(obj.graphics, objX, objY);
-                    }
-                }
+        if(this.gameVariables.player.noplayer === false) {
+            // Ui - Semi opacque background
+            if (this.gameStatus.showInventory) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
             }
 
-            if(this.gameVariables.inventoryTooltip !== null) {
-                const tooltip = this.spriteManager.getSprite('Tooltip');
-                console.log(this.gameVariables.inventoryTooltip.index);
-                const tooltipOffsetY = this.gameVariables.inventoryTooltip.index < 3 ? this.gameVariables.inventoryTooltip.index * inventorySlot.height + this.gameVariables.inventoryTooltip.index * 10 : 0;
-                ctx.drawImage(tooltip.graphics, this.gameWidth / 2 - tooltip.width / 2, this.gameHeight / 2 - tooltip.height / 2 + tooltipOffsetY - 30);
-                const tooltipTextX = this.gameWidth / 2 - tooltip.width / 2 + 50;
-                const tooltipTextY = this.gameHeight / 2 - tooltip.height / 2;
-                this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white');
+            // Ui - Inventory
+            const inventoryIcon = this.spriteManager.getSprite('InventoryIcon');
+            const inventorySlot = this.spriteManager.getSprite('InventorySlot');
+            ctx.drawImage(inventoryIcon.graphics, this.gameWidth - inventoryIcon.width - 20, 20);
+
+            if (this.gameStatus.showInventory) {
+                const overallSpaceX = inventorySlot.width * 4 + 60;
+                const overallSpaceY = inventorySlot.height * 4 + 60;
+
+                for(let i = 0; i < 4; i++) {
+                    for(let j = 0; j < 4; j++) {
+                        let obj = this.gameVariables.inventory[i * 4 + j];
+
+                        const slotX = this.gameWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
+                        const slotY = this.gameHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
+
+                        ctx.drawImage(inventorySlot.graphics, slotX, slotY);
+
+                        if(obj !== undefined) {
+                            obj = this.spriteManager.getSprite(obj.name);
+                            const objX = slotX + inventorySlot.width / 2 - obj.width / 2;
+                            const objY = slotY + inventorySlot.height / 2 - obj.height / 2;
+
+                            ctx.drawImage(obj.graphics, objX, objY);
+                        }
+                    }
+                }
+
+                if(this.gameVariables.inventoryTooltip !== null) {
+                    const tooltip = this.spriteManager.getSprite('Tooltip');
+                    console.log(this.gameVariables.inventoryTooltip.index);
+                    const tooltipOffsetY = this.gameVariables.inventoryTooltip.index < 3 ? this.gameVariables.inventoryTooltip.index * inventorySlot.height + this.gameVariables.inventoryTooltip.index * 10 : 0;
+                    ctx.drawImage(tooltip.graphics, this.gameWidth / 2 - tooltip.width / 2, this.gameHeight / 2 - tooltip.height / 2 + tooltipOffsetY - 30);
+                    const tooltipTextX = this.gameWidth / 2 - tooltip.width / 2 + 50;
+                    const tooltipTextY = this.gameHeight / 2 - tooltip.height / 2;
+                    this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white');
+                }
             }
         }
 
         this.mouseManager.setMouseCursor();
+    }
+
+    animateLoader() {
+        const loading = this.spriteManager.getSprite('Loading');
+        if(loading) {
+            console.log('animate loading...');
+            loading.animate();
+        }
     }
 
     animateMap() {

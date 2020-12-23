@@ -74,7 +74,7 @@ class MouseManager {
         const canvasY = event.clientY - rect.top;
 
         // Always process menu icons first
-        if(this.overMenuIcon(canvasX, canvasY, 'InventoryIcon')) {
+        if(this.overMenuIcon(canvasX, canvasY, 'InventoryIcon') && this.gameVariables.player.noplayer === false) {
             this.gameStatus.showInventory = !this.gameStatus.showInventory;
             if(this.gameStatus.showInventory) {
                 this.gameStatus.cursor = 'standard';
@@ -98,8 +98,9 @@ class MouseManager {
                 this.gameStatus.processInteractable = true;
                 // Move towards it or directly set for processing interactable
                 if (
-                    (foundInteractable.x < playerSprite.dx - playerSprite.width) ||
-                    (foundInteractable.x > playerSprite.dx + playerSprite.width)
+                    this.gameVariables.player.noplayer === false &&
+                    ((foundInteractable.x < playerSprite.dx - playerSprite.width) ||
+                     (foundInteractable.x > playerSprite.dx + playerSprite.width))
                 ) {
                     // Move towards it
                     this.gameStatus.cursor = 'move';
@@ -118,7 +119,7 @@ class MouseManager {
                 }
             } else {
                 // Move only if we are not processing an interactable already
-                if(!this.gameStatus.processInteractable) {
+                if(!this.gameStatus.processInteractable && this.gameVariables.player.noplayer === false) {
                     // Just move in a direction
                     this.gameStatus.cursor = 'move';
                     this.gameVariables.player.animation = 'walking';

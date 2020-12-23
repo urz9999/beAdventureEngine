@@ -1,0 +1,47 @@
+{
+  "name": "Main Menu",
+  "interactables": [
+    {
+      "type": "teleport",
+      "linked": "pressStart",
+      "x": 458,
+      "y": 340,
+      "width": 83,
+      "height": 32,
+      "goTo": 1,
+      "spawn": [80, 350]
+    }
+  ],
+  "characters": [
+    {
+      "name": "introBG",
+      "sWidth": 1000,
+      "frames": 36,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "name": "pressStart",
+      "sWidth": 83,
+      "frames": 2,
+      "x": 458,
+      "y": 340
+    }
+  ],
+  "objects": [
+    {
+      "name": "title1",
+      "sWidth": 500,
+      "frames": 100,
+      "x": 250,
+      "y": 150
+    }
+  ],
+  "bg_R_offset": 0,
+  "bg_M_offset": 0,
+  "bg_F_offset": 0,
+  "startingPoint": [-9999, -9999],
+  "startingMusic": "Mission.mp3",
+  "walkableOffset": 0,
+  "noplayer": true
+}

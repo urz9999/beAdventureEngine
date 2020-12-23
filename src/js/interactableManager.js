@@ -4,11 +4,14 @@ class InteractableManager {
     gameVariables;
 
     spriteManager;
+    mapManager;
 
     processTriggerSemaphore;
 
-    constructor(spriteManager, gameStatus, gameVariables, gameCanvas) {
+    constructor(spriteManager, mapManager, gameStatus, gameVariables, gameCanvas) {
         this.spriteManager = spriteManager;
+        this.mapManager = mapManager;
+
         this.gameStatus = gameStatus;
         this.gameVariables = gameVariables;
         this.gameCanvas = gameCanvas;
@@ -25,8 +28,18 @@ class InteractableManager {
                 case 'object': this.addToInventory(); this.processDialog(this.gameVariables.currentInteractable.messages); break;
                 case 'interact': this.processTriggerAndDialog(); break;
                 case 'question': this.processQuestionDialog(); break;
+                case 'teleport': this.processTeleport(); break;
             }
         }
+    }
+
+    processTeleport() {
+        this.gameStatus.levelStatus = 0;
+        const number = this.gameVariables.currentInteractable.goTo;
+        const spawnLocation = this.gameVariables.currentInteractable.spawn;
+        this.gameVariables.currentInteractable = null;
+        this.gameStatus.processInteractable = false;
+        this.mapManager.loadLevel(number, spawnLocation);
     }
 
     processQuestionDialog() {
@@ -116,6 +129,7 @@ class InteractableManager {
                 case 'object': this.incrementMessageIndex(); break;
                 case 'interact': this.incrementMessageIndex(); break;
                 case 'question': this.incrementMessageIndexOrRespond(); break;
+                case 'teleport': break;
             }
         }
     }

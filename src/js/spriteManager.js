@@ -11,7 +11,7 @@ class SpriteManager {
     }
 
     readMainCharacter() {
-        this.readSprite('main', '/assets/images/ui/pgs/main.png', {
+        this.readSprite('main', '/assets/images/ui/pgs/main.png',{
             type: 'main',
             sWidth: 53,
             sHeight: 94,
@@ -85,7 +85,6 @@ class Sprite {
     width;
     height;
     graphics;
-    scale;
 
     constructor(x, y, width, height, graphics) {
         this.x = x;
@@ -93,7 +92,6 @@ class Sprite {
         this.width = width;
         this.height = height;
         this.graphics = graphics;
-        this.scale = 1;
     }
 
     setCoords(x, y) {
@@ -103,18 +101,6 @@ class Sprite {
 
     getCoords() {
         return {x: this.x, y: this.y};
-    }
-
-    setScale(scale) {
-        this.scale = scale;
-    }
-
-    getScale() {
-        return this.scale;
-    }
-
-    resetScale() {
-        this.scale = 1;
     }
 }
 
