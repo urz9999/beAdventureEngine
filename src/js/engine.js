@@ -49,6 +49,7 @@ class beAdventureEngine {
             interactables: [],
             triggers: {},
             questions: {},
+            staticTexts: {},
             interactableAuraOn: null,
             currentMap: 0,
             currentMusic: '',
@@ -57,6 +58,7 @@ class beAdventureEngine {
             inventoryTooltip: null
         };
 
+        // ==== Respect this order to avoid circular dependencies ======
         this.settings = new Settings();
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
@@ -64,19 +66,17 @@ class beAdventureEngine {
         this.mapManager = new MapManager(this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
         this.interactableManager = new InteractableManager(this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
-
-
     }
 
     start(number) {
-        // ==== Pre load general data here... ==================
+        // ==== Pre load general data here... ============================
         this.fontManager.addFont('starmap', { color: 'white', size: 18 });
 
+        // ==== Load first map
         this.mapManager.loadLevel(number);
+        // ==== Start animation loop
         requestAnimationFrame((time) => this.gameLoop(time));
     }
-
-
 
     gameLoop(time) {
         requestAnimationFrame((time) => this.gameLoop(time));
@@ -92,12 +92,20 @@ class beAdventureEngine {
         this.gameCanvas.getContext('2d').clearRect(0, 0, this.gameWidth, this.gameHeight);
 
         // ==== Logic operations ============================
-        this.interactableManager.processInteractables();
+        if(!this.gameStatus.gamePaused) {
+            this.interactableManager.processInteractables();
+        }
 
         // ==== Animation Operation: including user inputs and interactions =====
-        switch (this.gameStatus.levelStatus) {
-            case 0: this.animateLoader(); break;
-            case 1: this.animateMap(); break;
+        if(!this.gameStatus.gamePaused) {
+            switch (this.gameStatus.levelStatus) {
+                case 0:
+                    this.animateLoader();
+                    break;
+                case 1:
+                    this.animateMap();
+                    break;
+            }
         }
 
         // ==== Drawing operation here... ===================
@@ -105,8 +113,6 @@ class beAdventureEngine {
             case 0: this.drawLoader(); break;
             case 1: this.drawMap(); break;
         }
-
-        // ==== End here ====================================
     }
 
     fixDpi() {
@@ -327,6 +333,17 @@ class beAdventureEngine {
                     this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white');
                 }
             }
+
+            // Ui - Pause Button
+            const pauseIcon = this.spriteManager.getSprite('PauseIcon');
+            ctx.drawImage(pauseIcon.graphics, this.gameWidth - 40 - inventoryIcon.width - pauseIcon.width, 20);
+
+        }
+
+        // Ui - static texts
+        for(let i = 0; i < this.gameVariables.staticTexts.length; i++) {
+            const text = this.gameVariables.staticTexts[i];
+            this.fontManager.drawText(this.gameCanvas, text.width, text.text, text.x, text.y, text.font, text.color);
         }
 
         this.mouseManager.setMouseCursor();

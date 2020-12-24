@@ -228,9 +228,10 @@
       "y": 410
     }
   ],
-  "bg_R_offset": -50,
-  "bg_M_offset": -50,
-  "bg_F_offset": -100,
+  "staticTexts": [],
+  "bg_R_offset": -250,
+  "bg_M_offset": 70,
+  "bg_F_offset": 200,
   "startingPoint": [50, 350],
   "startingMusic": "8-Bit-Perplexion.mp3",
   "walkableOffset": 0

@@ -42,6 +42,7 @@ class MapManager {
         this.spriteManager.readSprite('BG_F', `assets/images/maps/map${number}/map${number}_F.png`);
 
         // Load UI
+        this.spriteManager.readSprite('PauseIcon', `assets/images/ui/menu/pause.png`);
         this.spriteManager.readSprite('InventoryIcon', `assets/images/ui/menu/inventory.png`);
         this.spriteManager.readSprite('InventorySlot', `assets/images/ui/menu/inventorySlot.png`);
         this.spriteManager.readSprite('DialogBox', `assets/images/ui/menu/dialog.png`);
@@ -81,11 +82,8 @@ class MapManager {
         this.gameVariables.objects = map.objects;
         this.gameVariables.characters = map.characters;
         this.gameVariables.interactables = map.interactables;
-        this.gameVariables.player = { direction: true, animation: 'idle', noplayer: false }
-        if(map.noplayer !== undefined) {
-            // Used for maps where you don't have your character to move and no interactable ui is shown
-            this.gameVariables.player.noplayer = map.noplayer;
-        }
+        this.gameVariables.staticTexts = map.staticTexts;
+        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false }
 
         // Load all textures
         const waiter = setInterval(() => {
@@ -106,11 +104,12 @@ class MapManager {
                     this.spriteManager.getSprite(obj.name).setCoords(obj.x, obj.y);
                 }
 
+                // ==== Set status to map and start level
                 this.gameStatus.levelStatus = 1;
                 this.startLevel();
                 clearInterval(waiter);
             }
-        }, 5000);
+        }, 500);
     }
 
     startLevel() {

@@ -31,10 +31,33 @@
   "objects": [
     {
       "name": "title1",
-      "sWidth": 500,
-      "frames": 100,
       "x": 250,
-      "y": 150
+      "y": 160
+    },
+    {
+      "name": "beSharp",
+      "x": 350,
+      "y": 60
+    }
+  ],
+  "staticTexts": [
+    {
+      "name": "copyright",
+      "width": 960,
+      "text": "beAdventureEngine and demo game copyright 2020/2021 beSharp srl. Engine by Alessandro Gaggia.",
+      "color": "white",
+      "font": "starmap",
+      "x": 10,
+      "y": 470
+    },
+    {
+      "name": "subtitle",
+      "width": 600,
+      "text": "A cyberpunk adventure in the world of Cloud!",
+      "color": "white",
+      "font": "starmap",
+      "x": 300,
+      "y": 270
     }
   ],
   "bg_R_offset": 0,
