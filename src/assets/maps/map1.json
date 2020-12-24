@@ -2,6 +2,33 @@
   "name": "Exterior World",
   "interactables": [
     {
+      "type": "exit",
+      "linked": "door",
+      "x": 737,
+      "y": 339,
+      "width": 27,
+      "height": 52,
+      "goTo": 2,
+      "spawn": [80, 350],
+      "condition": [
+        { "object": { "name" : "money", "value": 1 } },
+        { "trigger": { "name": "lever", "value": 1 } }
+      ],
+      "notMetMessages": [
+        {
+          "type": "other",
+          "name": "Buttafuori avido",
+          "text": "Uè bella frugna ce l'hai il denaro? E ricordati che la leva va tirata eh! Altrimenti stai a casa!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Che volgare! Vabbè 'speta nè, che faccio, BALUBA!"
+        }
+      ]
+    },
+    {
       "type": "question",
       "linked": "eri",
       "x": 890,
@@ -226,6 +253,11 @@
       "name": "lever",
       "x": 430,
       "y": 410
+    },
+    {
+      "name": "door",
+      "x": 737,
+      "y": 339
     }
   ],
   "staticTexts": [],

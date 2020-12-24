@@ -42,6 +42,7 @@ class MapManager {
         this.spriteManager.readSprite('BG_F', `assets/images/maps/map${number}/map${number}_F.png`);
 
         // Load UI
+        this.spriteManager.readSprite('PlayIcon', `assets/images/ui/menu/play.png`);
         this.spriteManager.readSprite('PauseIcon', `assets/images/ui/menu/pause.png`);
         this.spriteManager.readSprite('InventoryIcon', `assets/images/ui/menu/inventory.png`);
         this.spriteManager.readSprite('InventorySlot', `assets/images/ui/menu/inventorySlot.png`);
@@ -79,11 +80,11 @@ class MapManager {
         }
 
         // Set game variables to map data
-        this.gameVariables.objects = map.objects;
+        this.gameVariables.objects = this.filterObjectsFromInventory(map.objects);
         this.gameVariables.characters = map.characters;
-        this.gameVariables.interactables = map.interactables;
+        this.gameVariables.interactables = this.filterInteractablesFromInventory(map.interactables);
         this.gameVariables.staticTexts = map.staticTexts;
-        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false }
+        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialLocation: spawnLocation || map.startingPoint }
 
         // Load all textures
         const waiter = setInterval(() => {
@@ -93,14 +94,14 @@ class MapManager {
                 this.spriteManager.getSprite('main').setCoords(startingLocation[0], startingLocation[1]);
 
                 // Set character position
-                for(let i = 0; i < map.characters.length; i++) {
-                    const char = map.characters[i];
+                for(let i = 0; i < this.gameVariables.characters.length; i++) {
+                    const char = this.gameVariables.characters[i];
                     this.spriteManager.getSprite(char.name).setCoords(char.x, char.y);
                 }
 
                 // Set objects position
-                for(let i = 0; i < map.objects.length; i++) {
-                    const obj = map.objects[i];
+                for(let i = 0; i < this.gameVariables.objects.length; i++) {
+                    const obj = this.gameVariables.objects[i];
                     this.spriteManager.getSprite(obj.name).setCoords(obj.x, obj.y);
                 }
 
@@ -109,10 +110,34 @@ class MapManager {
                 this.startLevel();
                 clearInterval(waiter);
             }
-        }, 500);
+        }, 2000);
     }
 
     startLevel() {
         this.soundSystem.playBackgroundMusic(this.gameVariables.currentMusic);
+    }
+
+    filterObjectsFromInventory(objects) {
+        return objects.filter(obj => {
+            for(let i = 0; i < this.gameVariables.inventory.length; i++) {
+                const inv = this.gameVariables.inventory[i];
+                if(inv.name === obj.name) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    filterInteractablesFromInventory(interactables) {
+        return interactables.filter(int => {
+            for(let i = 0; i < this.gameVariables.inventory.length; i++) {
+                const inv = this.gameVariables.inventory[i];
+                if(inv.name === int.linked) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 }

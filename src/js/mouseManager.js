@@ -40,6 +40,8 @@ class MouseManager {
                     case 'location': this.gameStatus.cursor = 'exit'; break;
                     case 'question': this.gameStatus.cursor = 'talk'; break;
                     case 'look': this.gameStatus.cursor = 'look'; break;
+                    case 'teleport': this.gameStatus.cursor = 'standard'; break;
+                    case 'exit': this.gameStatus.cursor = 'exit'; break;
                 }
                 this.gameVariables.interactableAuraOn = foundInteractable.linked;
             } else {
@@ -83,58 +85,61 @@ class MouseManager {
         }
 
         // Pause - Always process menu icons first
-        if(this.overMenuIcon(canvasX, canvasY, 'PauseIcon') && this.gameVariables.player.noplayer === false) {
+        if((this.overMenuIcon(canvasX, canvasY, 'PauseIcon') || this.overMenuIcon(canvasX, canvasY, 'PlayIcon')) && this.gameVariables.player.noplayer === false) {
             this.gameStatus.gamePaused = !this.gameStatus.gamePaused;
             return;
         }
 
-        // Process questions
-        if(this.gameStatus.doingQuestion) {
-            if(this.gameVariables.questions[this.gameVariables.currentInteractable.linked].answeredQuestionNumber > -1) {
-                this.interactableManager.processClicksForEvents();
-                this.gameStatus.blockMouseAction = false;
-            }
-            return;
-        }
+        if(!this.gameStatus.gamePaused) {
 
-        if(!this.gameStatus.showInventory) {
-            const foundInteractable = this.overInteractable(canvasX, canvasY);
-            if(foundInteractable !== null && !this.gameStatus.processInteractable) {
-                this.gameVariables.currentInteractable = foundInteractable;
-                this.gameStatus.processInteractable = true;
-                // Move towards it or directly set for processing interactable
-                if (
-                    this.gameVariables.player.noplayer === false &&
-                    ((foundInteractable.x < playerSprite.dx - playerSprite.width) ||
-                     (foundInteractable.x > playerSprite.dx + playerSprite.width))
-                ) {
-                    // Move towards it
-                    this.gameStatus.cursor = 'move';
-                    this.gameVariables.player.animation = 'walking';
-                    this.gameVariables.player.direction = foundInteractable.x > playerSprite.dx;
-                    this.gameVariables.player.reachX = foundInteractable.x;
-
-                    // Set moving towards conditions
-                    this.gameStatus.walkingToInteractable = true;
-                    this.gameStatus.blockMouseAction = true;
-                } else {
-                    // Directly process interactable as they are close enough
-                    this.gameStatus.walkingToInteractable = false;
-                    this.gameStatus.blockMouseAction = false;
+            // Process questions
+            if(this.gameStatus.doingQuestion) {
+                if(this.gameVariables.questions[this.gameVariables.currentInteractable.linked].answeredQuestionNumber > -1) {
                     this.interactableManager.processClicksForEvents();
+                    this.gameStatus.blockMouseAction = false;
                 }
-            } else {
-                // Move only if we are not processing an interactable already
-                if(!this.gameStatus.processInteractable && this.gameVariables.player.noplayer === false) {
-                    // Just move in a direction
-                    this.gameStatus.cursor = 'move';
-                    this.gameVariables.player.animation = 'walking';
-                    this.gameVariables.player.direction = canvasX > playerSprite.dx;
-                    this.gameVariables.player.reachX = canvasX;
-                    this.gameStatus.blockMouseAction = true;
+                return;
+            }
+
+            if(!this.gameStatus.showInventory) {
+                const foundInteractable = this.overInteractable(canvasX, canvasY);
+                if(foundInteractable !== null && !this.gameStatus.processInteractable) {
+                    this.gameVariables.currentInteractable = foundInteractable;
+                    this.gameStatus.processInteractable = true;
+                    // Move towards it or directly set for processing interactable
+                    if (
+                        this.gameVariables.player.noplayer === false &&
+                        ((foundInteractable.x < playerSprite.dx - playerSprite.width) ||
+                         (foundInteractable.x > playerSprite.dx + playerSprite.width))
+                    ) {
+                        // Move towards it
+                        this.gameStatus.cursor = 'move';
+                        this.gameVariables.player.animation = 'walking';
+                        this.gameVariables.player.direction = foundInteractable.x > playerSprite.dx;
+                        this.gameVariables.player.reachX = foundInteractable.x;
+
+                        // Set moving towards conditions
+                        this.gameStatus.walkingToInteractable = true;
+                        this.gameStatus.blockMouseAction = true;
+                    } else {
+                        // Directly process interactable as they are close enough
+                        this.gameStatus.walkingToInteractable = false;
+                        this.gameStatus.blockMouseAction = false;
+                        this.interactableManager.processClicksForEvents();
+                    }
                 } else {
-                    this.interactableManager.processClicksForEvents();
-                    this.gameStatus.blockMouseAction = false;
+                    // Move only if we are not processing an interactable already
+                    if(!this.gameStatus.processInteractable && this.gameVariables.player.noplayer === false) {
+                        // Just move in a direction
+                        this.gameStatus.cursor = 'move';
+                        this.gameVariables.player.animation = 'walking';
+                        this.gameVariables.player.direction = canvasX > playerSprite.dx;
+                        this.gameVariables.player.reachX = canvasX;
+                        this.gameStatus.blockMouseAction = true;
+                    } else {
+                        this.interactableManager.processClicksForEvents();
+                        this.gameStatus.blockMouseAction = false;
+                    }
                 }
             }
         }
@@ -148,6 +153,7 @@ class MouseManager {
             'look': `url('assets/images/ui/menu/cursors/look.cur'), auto`,
             'take': `url('assets/images/ui/menu/cursors/take.cur'), auto`,
             'talk': `url('assets/images/ui/menu/cursors/talk.cur'), auto`,
+            'teleport': `url('assets/images/ui/menu/cursors/standard.cur'), auto`,
             'exit': `url('assets/images/ui/menu/cursors/exit.cur'), auto`
         };
         this.gameCanvas.style.cursor = map[name];
@@ -155,7 +161,7 @@ class MouseManager {
 
     overMenuIcon(canvasX, canvasY, name) {
         const menuIcon = this.spriteManager.getSprite(name);
-        const menuIconX = this.gameCanvas.parentElement.clientWidth - menuIcon.width - 20;
+        const menuIconX = menuIcon.x;
         const menuIconY = 20;
         const test = (
             canvasX > menuIconX && canvasX < (menuIconX + menuIcon.width) &&

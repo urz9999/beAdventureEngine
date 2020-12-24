@@ -1,0 +1,30 @@
+{
+  "name": "Bar",
+  "interactables": [
+    {
+      "type": "exit",
+      "linked": "door",
+      "x": 200,
+      "y": 231,
+      "width": 116,
+      "height": 182,
+      "goTo": 1,
+      "spawn": [730, 350]
+    }
+  ],
+  "characters": [],
+  "objects": [
+    {
+      "name": "door2",
+      "x": 200,
+      "y": 231
+    }
+  ],
+  "staticTexts": [],
+  "bg_R_offset": 0,
+  "bg_M_offset": 0,
+  "bg_F_offset": 0,
+  "startingPoint": [170, 350],
+  "startingMusic": "Mission.mp3",
+  "walkableOffset": 0
+}

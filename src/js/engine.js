@@ -42,7 +42,7 @@ class beAdventureEngine {
         };
 
         this.gameVariables = {
-            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false },
+            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false, initialLocation: [0, 0] },
             objects: [],
             characters: [],
             inventory: [],
@@ -298,7 +298,9 @@ class beAdventureEngine {
             // Ui - Inventory
             const inventoryIcon = this.spriteManager.getSprite('InventoryIcon');
             const inventorySlot = this.spriteManager.getSprite('InventorySlot');
+
             ctx.drawImage(inventoryIcon.graphics, this.gameWidth - inventoryIcon.width - 20, 20);
+            inventoryIcon.x = this.gameWidth - inventoryIcon.width - 20;
 
             if (this.gameStatus.showInventory) {
                 const overallSpaceX = inventorySlot.width * 4 + 60;
@@ -335,9 +337,15 @@ class beAdventureEngine {
             }
 
             // Ui - Pause Button
+            const playIcon = this.spriteManager.getSprite('PlayIcon');
             const pauseIcon = this.spriteManager.getSprite('PauseIcon');
-            ctx.drawImage(pauseIcon.graphics, this.gameWidth - 40 - inventoryIcon.width - pauseIcon.width, 20);
-
+            if(this.gameStatus.gamePaused) {
+                ctx.drawImage(playIcon.graphics, this.gameWidth - 40 - inventoryIcon.width - playIcon.width, 20);
+            } else {
+                ctx.drawImage(pauseIcon.graphics, this.gameWidth - 40 - inventoryIcon.width - pauseIcon.width, 20);
+            }
+            playIcon.x = this.gameWidth - 40 - inventoryIcon.width - playIcon.width;
+            pauseIcon.x = this.gameWidth - 40 - inventoryIcon.width - pauseIcon.width;
         }
 
         // Ui - static texts
@@ -352,7 +360,6 @@ class beAdventureEngine {
     animateLoader() {
         const loading = this.spriteManager.getSprite('Loading');
         if(loading) {
-            console.log('animate loading...');
             loading.animate();
         }
     }
@@ -382,35 +389,45 @@ class beAdventureEngine {
             // process movement
             const x = player.getCoords().x;
             if(
-                (direction === false && x > this.gameVariables.player.reachX) ||
-                (direction === true  && x < (this.gameVariables.player.reachX - player.subSprite.width))
+                (direction === false && x >= this.gameVariables.player.reachX - 2 * player.subSprite.width) ||
+                (direction === true  && x < (this.gameVariables.player.reachX + player.subSprite.width))
             ) {
-                const newX = x + (direction ? 20 : -20);
+                // Move player: added fix for offset movement on object on the scene
+                this.gameVariables.player.reachX = this.gameVariables.player.reachX - (direction ? 20.0 : -20.0);
+                const initialX = this.gameVariables.player.initialLocation[0] * 0.5;
+                const newX = x + (direction ? 20.0 : -20.0);
                 player.setCoords(newX, player.getCoords().y);
 
                 // ==== Move background, characters, interaction according to player
                 // === Backgrounds
-                bgR.setCoords(-newX * 0.3, bgR.getCoords().y);
-                bgM.setCoords(-newX * 0.5, bgM.getCoords().y);
-                bgF.setCoords(-newX * 0.7, bgF.getCoords().y);
+                if(bgR.width > this.gameWidth) { bgR.setCoords(- newX * 0.3 - initialX, bgR.getCoords().y); }
+                if(bgM.width > this.gameWidth) { bgM.setCoords(- newX * 0.5 - initialX, bgM.getCoords().y); }
+                if(bgF.width > this.gameWidth) { bgF.setCoords(- newX * 0.7 - initialX, bgF.getCoords().y); }
+
                 // === Characters
-                for(let i = 0; i < this.gameVariables.characters.length; i++) {
-                    const name = this.gameVariables.characters[i].name;
-                    const char = this.spriteManager.getSprite(name);
-                    char.setCoords(char.getCoords().x + x * 0.5 -newX * 0.5, char.getCoords().y);
-                }
-                // === Objects
-                for(let i = 0; i < this.gameVariables.objects.length; i++) {
-                    const name = this.gameVariables.objects[i].name;
-                    const obj = this.spriteManager.getSprite(name);
-                    obj.setCoords(obj.getCoords().x + x * 0.5 -newX * 0.5, obj.getCoords().y);
-                }
-                // === Interactions
-                for(let i = 0; i < this.gameVariables.interactables.length; i++) {
-                    const interactable = this.gameVariables.interactables[i];
-                    interactable.x = interactable.x + x * 0.5 - newX * 0.5;
+                if(bgM.width > this.gameWidth) {
+                    for (let i = 0; i < this.gameVariables.characters.length; i++) {
+                        const name = this.gameVariables.characters[i].name;
+                        const char = this.spriteManager.getSprite(name);
+                        char.setCoords(char.getCoords().x - (direction ? 20.0 : -20.0) * 0.5 - initialX, char.getCoords().y);
+                    }
+                    // === Objects
+                    for (let i = 0; i < this.gameVariables.objects.length; i++) {
+                        const name = this.gameVariables.objects[i].name;
+                        const obj = this.spriteManager.getSprite(name);
+                        obj.setCoords(obj.getCoords().x - (direction ? 20.0 : -20.0) * 0.5 - initialX, obj.getCoords().y);
+                    }
+                    // === Interactions
+                    for (let i = 0; i < this.gameVariables.interactables.length; i++) {
+                        const interactable = this.gameVariables.interactables[i];
+                        interactable.x = interactable.x - (direction ? 20.0 : -20.0) * 0.5 - initialX;
+                    }
                 }
 
+                // After first time stop using its contribution
+                this.gameVariables.player.initialLocation[0] = 0;
+
+                // Set cursor as move
                 this.gameStatus.cursor = 'move';
             } else {
                 // reached destination: return idle and enable clicks

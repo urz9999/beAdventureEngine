@@ -29,11 +29,13 @@ class InteractableManager {
                 case 'interact': this.processTriggerAndDialog(); break;
                 case 'question': this.processQuestionDialog(); break;
                 case 'teleport': this.processTeleport(); break;
+                case 'exit': this.processTeleport(); break;
             }
         }
     }
 
     processTeleport() {
+        this.gameStatus.cursor = 'standard';
         this.gameStatus.levelStatus = 0;
         const number = this.gameVariables.currentInteractable.goTo;
         const spawnLocation = this.gameVariables.currentInteractable.spawn;
