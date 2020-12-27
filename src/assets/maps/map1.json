@@ -2,6 +2,70 @@
   "name": "Exterior World",
   "interactables": [
     {
+      "type": "minigame",
+      "linked": "brainface",
+      "x": 1676,
+      "y": 224,
+      "width": 121,
+      "height": 209,
+      "conditions": [
+        { "object": { "name" : "dorothyCard", "value": 1 } }
+      ],
+      "result": [{ "wingame": 1 }],
+      "notMetMessages": [
+        {
+          "type": "other",
+          "portrait": "brainface",
+          "name": "Brain Face",
+          "text": "Ohohohohoho misero umanoide tettuto di cromosomi XX! Non hai il pass per poter accedere alla mia sfida!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ah! Sessismo! Vieni vieni! Che tanto non ti faccio niente! Dai!"
+        },
+        {
+          "type": "other",
+          "portrait": "brainface",
+          "name": "Brain Face",
+          "text": "Oh..ehm, no cioè, sì insomma... è che serve il pass, mica faccio io le regole!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ah! vabbè! Capito, ti è andata bene, ma ti tengo d'occhio!"
+        }
+      ],
+      "completedMessages": [
+        {
+          "type": "other",
+          "name": "Brain Face",
+          "portrait": "brainface",
+          "text": "Ohh! Che forza hai vinto!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "E' ovvio! In un mondo governato dal politically correct, devo ergermi a baluardo del... sti gran c***i! Io faccio da sola!"
+        },
+        {
+          "type": "other",
+          "name": "Brain Face",
+          "portrait": "brainface",
+          "text": "Impressionante! Hai vinto ora quando sarà finito il dialogo usando il trigger 'wingame' andrai ai crediti"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Uuuuh yeah! E mi raccomando! non fare lo stronzetto!"
+        }
+      ]
+    },
+    {
       "type": "exit",
       "linked": "door",
       "x": 737,
@@ -10,7 +74,7 @@
       "height": 52,
       "goTo": 2,
       "spawn": [80, 350],
-      "condition": [
+      "conditions": [
         { "object": { "name" : "money", "value": 1 } },
         { "trigger": { "name": "lever", "value": 1 } }
       ],
@@ -241,6 +305,13 @@
       "frames": 6,
       "x": 890,
       "y": 353
+    },
+    {
+      "name": "brainface",
+      "sWidth": 280,
+      "frames": 8,
+      "x": 1600,
+      "y": 203
     }
   ],
   "objects": [

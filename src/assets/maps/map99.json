@@ -1,0 +1,100 @@
+{
+  "name": "Credits",
+  "interactables": [
+    {
+      "type": "openurl",
+      "linked": "pressFinish",
+      "url": "https://www.google.it",
+      "x": 458,
+      "y": 340,
+      "width": 83,
+      "height": 32
+    }
+  ],
+  "characters": [
+    {
+      "name": "introBG",
+      "sWidth": 1000,
+      "frames": 36,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "name": "pressFinish",
+      "sWidth": 83,
+      "frames": 2,
+      "x": 458,
+      "y": 340
+    }
+  ],
+  "objects": [
+    {
+      "name": "creditBG",
+      "x": 80,
+      "y": 80
+    }
+  ],
+  "staticTexts": [
+    {
+      "name": "credit1",
+      "width": 800,
+      "text": "<====> beAdventureEngine <====>",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 100
+    },
+    {
+      "name": "credit2",
+      "width": 800,
+      "text": "==> Engine: Alessandro Gaggia",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 120
+    },
+    {
+      "name": "credit3",
+      "width": 800,
+      "text": "==> Demo story: Alessandro Gaggia",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 140
+    },
+    {
+      "name": "credit4",
+      "width": 800,
+      "text": "==> Sounds: l\\'internet",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 160
+    },
+    {
+      "name": "credit5",
+      "width": 800,
+      "text": "==> Sprites: Gooooogle",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 180
+    },
+    {
+      "name": "credit6",
+      "width": 800,
+      "text": "==> Copyright: 2020/2021 beSharp srl",
+      "color": "white",
+      "font": "starmap",
+      "x": 100,
+      "y": 200
+    }
+  ],
+  "bg_R_offset": 0,
+  "bg_M_offset": 0,
+  "bg_F_offset": 0,
+  "startingPoint": [-9999, -9999],
+  "startingMusic": "Mission.mp3",
+  "walkableOffset": 0,
+  "noplayer": true
+}

@@ -38,6 +38,8 @@ class beAdventureEngine {
             blockMouseAction: false,
             processInteractable: false,
             walkingToInteractable: false,
+            wingame: false,
+            inCredits: false,
 
             cursor: 'standard'
         };
@@ -98,17 +100,15 @@ class beAdventureEngine {
         // ==== Logic operations ============================
         if(!this.gameStatus.gamePaused) {
             this.interactableManager.processInteractables();
+            // Process Win game
+            this.interactableManager.processWinGame(this.settings.creditMap);
         }
 
         // ==== Animation Operation: including user inputs and interactions =====
         if(!this.gameStatus.gamePaused) {
             switch (this.gameStatus.levelStatus) {
-                case 0:
-                    this.animateLoader();
-                    break;
-                case 1:
-                    this.animateMap();
-                    break;
+                case 0: this.animateLoader(); break;
+                case 1: this.animateMap(); break;
             }
         }
 
@@ -218,13 +218,16 @@ class beAdventureEngine {
             const text = this.gameVariables.currentDialog.text;
             const portrait = this.gameVariables.currentDialog.portrait;
 
+            this.fontManager. drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white');
+
             if(portrait !== undefined && portrait !== null) {
                 const faceSprite = this.spriteManager.getSprite(`${portrait}Face`);
                 ctx.drawImage(faceSprite.graphics, 310, 220, 64, 64);
-            }
 
-            this.fontManager. drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white');
-            this.fontManager. drawText(this.gameCanvas, 310, text, 390, 230, 'starmap', 'white');
+                this.fontManager. drawText(this.gameCanvas, 310, text, 390, 230, 'starmap', 'white');
+            } else {
+                this.fontManager. drawText(this.gameCanvas, 390, text, 310, 230, 'starmap', 'white');
+            }
         }
 
         // Ui - Show question dialog

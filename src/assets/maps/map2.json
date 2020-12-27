@@ -10,9 +10,85 @@
       "height": 182,
       "goTo": 1,
       "spawn": [730, 350]
+    },
+    {
+      "type": "combine",
+      "linked": "dorothy",
+      "x": 900,
+      "y": 385,
+      "width": 85,
+      "height": 100,
+      "conditions": [
+        { "object": { "name" : "potion", "value": 1 } },
+        { "trigger": { "name": "eri", "value": 1 } }
+      ],
+      "result": [
+        { "trigger": 1 },
+        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco di Dorothy!" } }
+      ],
+      "notMetMessages": [
+        {
+          "type": "other",
+          "name": "Dorothy MK VII",
+          "portrait": "dorothy",
+          "text": "Ueeeh non riesco a recuperare una pozione di energia!!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Che pozione? A cosa ti serve?"
+        },
+        {
+          "type": "other",
+          "name": "Dorothy MK VII",
+          "portrait": "dorothy",
+          "text": "Il mio nucleo energetico funziona a pozioni rosa! Mi sto scaricando! HO FAAAMEEEEE!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ok ok! Penso di sapere cosa fare!"
+        }
+      ],
+      "completedMessages": [
+        {
+          "type": "other",
+          "name": "Dorothy MK VII",
+          "portrait": "dorothy",
+          "text": "Oooh! Una pozione rosa! ... Glu...glu..glu...aaah! Mi sento al massimo! Grazie!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Mica ti ho detto che era gratis! Sgancia una ricompensa ammasso di bulloni e ingranaggi!"
+        },
+        {
+          "type": "other",
+          "name": "Dorothy MK VII",
+          "portrait": "dorothy",
+          "text": "Ti ho lasciato un pass per partecipare alla sfida di Brain Face! Vedi di vincere!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Assolutamente! Perchè la capra è l'animale migliore di sempre...dopo... la Donna!"
+        }
+      ]
     }
   ],
-  "characters": [],
+  "characters": [
+    {
+      "name": "dorothy",
+      "sWidth": 85,
+      "frames": 2,
+      "x": 900,
+      "y": 385
+    }
+  ],
   "objects": [
     {
       "name": "door2",

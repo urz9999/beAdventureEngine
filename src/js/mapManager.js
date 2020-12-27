@@ -84,6 +84,15 @@ class MapManager {
             }
         }
 
+        // Load prize for combines
+        const combines = map.interactables.filter(int => int.type === 'combine');
+        for(let i = 0; i < combines.length; i++) {
+            const objects = combines[i].result.filter(r => r.object !== undefined);
+            for(let j = 0; j < objects.length; j++) {
+                this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
+            }
+        }
+
         // Set game variables to map data
         this.gameVariables.objects = this.filterObjectsFromInventory(map.objects);
         this.gameVariables.characters = map.characters;

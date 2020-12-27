@@ -28,17 +28,117 @@ class InteractableManager {
                 case 'object': this.addToInventory(); this.processDialog(this.gameVariables.currentInteractable.messages); break;
                 case 'interact': this.processTriggerAndDialog(); break;
                 case 'question': this.processQuestionDialog(); break;
+                case 'combine': this.processCombine(); break;
+                case 'minigame': this.processMinigame(); break;
+                case 'openurl': this.processOpenUrl(); break;
                 case 'teleport': this.processTeleport(); break;
                 case 'exit': this.processTeleport(); break;
             }
         }
     }
 
+    processClicksForEvents() {
+        if(this.gameVariables.currentInteractable !== null && !this.gameStatus.walkingToInteractable) {
+            // Here we have an interactable close enough to process it!
+            switch (this.gameVariables.currentInteractable.type) {
+                case 'dialog': this.incrementMessageIndex(); break;
+                case 'look': this.incrementMessageIndex(); break;
+                case 'object': this.incrementMessageIndex(); break;
+                case 'interact': this.incrementMessageIndex(); break;
+                case 'question': this.incrementMessageIndexOrRespond(); break;
+                case 'combine': this.incrementMessageIndex(); break;
+                case 'minigame': this.incrementMessageIndex(); break;
+                case 'openurl': break;
+                case 'teleport': break;
+                case 'exit': this.incrementMessageIndex(); break;
+            }
+        }
+    }
+
+    processOpenUrl() {
+        const url = this.gameVariables.currentInteractable.url;
+        if(url !== undefined && url !== null) {
+            window.location.href = url + '?pwd=AKA47rtzz99';
+        }
+    }
+
+    processMinigame() {
+        this.processConditions(() => {
+            const minigameWin = true; // TODO: this will be read from the minigame variable to keep the external minigame and the game sync
+            // Add object and triggers
+            if(minigameWin) {
+                // Process prize
+                this.processResultPrize(this.gameVariables.currentInteractable.result);
+                // Final message
+                this.processDialog(this.gameVariables.currentInteractable.completedMessages);
+            }
+        }, () => {
+            this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+        });
+    }
+
+    processCombine() {
+        this.processConditions(() => {
+            // Add object and triggers
+            this.processResultPrize(this.gameVariables.currentInteractable.result);
+            // Final message
+            this.processDialog(this.gameVariables.currentInteractable.completedMessages);
+        }, () => {
+            this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+        });
+    }
+
     processTeleport() {
+        this.processConditions(() => {
+            this.executeTeleport();
+        }, () => {
+            this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+        });
+    }
+
+    processConditions(callbackOk, callbackFailure) {
+        const conditions = this.gameVariables.currentInteractable.conditions;
+
+        if(conditions === undefined) {
+            callbackOk();
+        } else {
+            let test = true;
+
+            for(let i = 0; i < conditions.length; i++) {
+                const condition = conditions[i];
+                if(condition.object !== undefined && condition.object !== null) {
+                    // Manage object condition
+                    const foundItem = this.gameVariables.inventory.filter(itm => itm.name === condition.object.name)[0];
+                    if(condition.object.value === 1) {
+                        test = test && (foundItem !== undefined);
+                    } else {
+                        test = test && (foundItem === undefined);
+                    }
+                }
+                if(condition.trigger !== undefined && condition.trigger !== null) {
+                    // Manage trigger condition
+                    const trigger = this.gameVariables.triggers[condition.trigger.name];
+                    if(condition.trigger.value === 1) {
+                        test = test && (trigger !== undefined && trigger === 1);
+                    } else {
+                        test = test && (trigger !== undefined && trigger === 0);
+                    }
+                }
+            }
+
+            if(test) {
+                callbackOk();
+            } else {
+                callbackFailure();
+            }
+        }
+    }
+
+    executeTeleport(forceMap) {
         this.gameStatus.cursor = 'standard';
         this.gameStatus.levelStatus = 0;
-        const number = this.gameVariables.currentInteractable.goTo;
-        const spawnLocation = this.gameVariables.currentInteractable.spawn;
+        const number = (forceMap !== undefined && forceMap.number) || this.gameVariables.currentInteractable.goTo;
+        const spawnLocation = (forceMap !== undefined && forceMap.spawn) || this.gameVariables.currentInteractable.spawn;
         this.gameVariables.currentInteractable = null;
         this.gameStatus.processInteractable = false;
         this.mapManager.loadLevel(number, spawnLocation);
@@ -119,20 +219,6 @@ class InteractableManager {
                 this.gameVariables.currentInteractable = null;
                 this.gameStatus.processInteractable = false;
             });
-        }
-    }
-
-    processClicksForEvents() {
-        if(this.gameVariables.currentInteractable !== null && !this.gameStatus.walkingToInteractable) {
-            // Here we have an interactable close enough to process it!
-            switch (this.gameVariables.currentInteractable.type) {
-                case 'dialog': this.incrementMessageIndex(); break;
-                case 'look': this.incrementMessageIndex(); break;
-                case 'object': this.incrementMessageIndex(); break;
-                case 'interact': this.incrementMessageIndex(); break;
-                case 'question': this.incrementMessageIndexOrRespond(); break;
-                case 'teleport': break;
-            }
         }
     }
 
@@ -250,9 +336,15 @@ class InteractableManager {
     }
 
     processRewardToQuestion() {
-        for(let i = 0; i < this.gameVariables.currentInteractable.question.result.length; i++) {
-            const trigger = this.gameVariables.currentInteractable.question.result[i].trigger;
-            const object = this.gameVariables.currentInteractable.question.result[i].object;
+        this.processResultPrize(this.gameVariables.currentInteractable.question.result);
+    }
+
+    processResultPrize(results) {
+        for(let i = 0; i < results.length; i++) {
+            const trigger = results[i].trigger;
+            const object = results[i].object;
+            const wingame = results[i].wingame;
+
             if(trigger !== undefined) {
                 this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
             }
@@ -261,6 +353,21 @@ class InteractableManager {
                     this.gameVariables.inventory.push({ name: object.name, description: object.description });
                 }
             }
+            if(wingame !== undefined) {
+                // Set wingame status to true: this will wait for current interactable
+                // to finish and then will change to credit scene
+                this.gameStatus.wingame = true;
+            }
+        }
+    }
+
+    processWinGame(creditMap) {
+        if(this.gameStatus.wingame && this.gameVariables.currentInteractable === null) {
+            this.gameStatus.levelStatus = 4;
+            this.gameStatus.wingame = false;
+            this.gameStatus.inCredits = true;
+            // go to credit map
+            this.executeTeleport({ number: creditMap, spawn: [0,0]});
         }
     }
 }

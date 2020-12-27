@@ -40,6 +40,9 @@ class MouseManager {
                     case 'location': this.gameStatus.cursor = 'exit'; break;
                     case 'question': this.gameStatus.cursor = 'talk'; break;
                     case 'look': this.gameStatus.cursor = 'look'; break;
+                    case 'combine': this.gameStatus.cursor = 'combine'; break;
+                    case 'minigame': this.gameStatus.cursor = 'combine'; break;
+                    case 'openurl': this.gameStatus.cursor = 'standard'; break;
                     case 'teleport': this.gameStatus.cursor = 'standard'; break;
                     case 'exit': this.gameStatus.cursor = 'exit'; break;
                 }
@@ -155,6 +158,7 @@ class MouseManager {
             'look': `url('assets/images/ui/menu/cursors/look.cur'), auto`,
             'take': `url('assets/images/ui/menu/cursors/take.cur'), auto`,
             'talk': `url('assets/images/ui/menu/cursors/talk.cur'), auto`,
+            'combine': `url('assets/images/ui/menu/cursors/combine.cur'), auto`,
             'teleport': `url('assets/images/ui/menu/cursors/standard.cur'), auto`,
             'exit': `url('assets/images/ui/menu/cursors/exit.cur'), auto`
         };
