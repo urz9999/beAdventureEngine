@@ -25,10 +25,15 @@
   <script src="js/mouseManager.js"></script>
   <script src="js/interactableManager.js"></script>
   <script src="js/mapManager.js"></script>
+  <script src="js/minigame.js"></script>
+  <!-- Minigames here -->
+  <script src="assets/minigames/fallout-minigame/fallout-minigame.js"></script>
+  <!-- ============== -->
   <script src="js/engine.js"></script>
 
   <script>
     const game = new beAdventureEngine("game");
+    game.registerMiniGame("FalloutMinigame", FalloutMinigame);
     game.start(0);
   </script>
 </body>

@@ -4,6 +4,7 @@
     {
       "type": "minigame",
       "linked": "brainface",
+      "game": "FalloutMinigame",
       "x": 1676,
       "y": 224,
       "width": 121,
@@ -62,6 +63,14 @@
           "name": "Madeline",
           "portrait": "main",
           "text": "Uuuuh yeah! E mi raccomando! non fare lo stronzetto!"
+        }
+      ],
+      "retryMessages": [
+        {
+          "type": "other",
+          "name": "Brain Face",
+          "portrait": "brainface",
+          "text": "Ahahaha hai PIERSOU! Riprova!"
         }
       ]
     },

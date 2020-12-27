@@ -64,14 +64,33 @@ class InteractableManager {
 
     processMinigame() {
         this.processConditions(() => {
-            const minigameWin = true; // TODO: this will be read from the minigame variable to keep the external minigame and the game sync
+            if(this.gameVariables.selectedMinigame === null) {
+                this.gameVariables.selectedMinigame = this.gameVariables.minigames[this.gameVariables.currentInteractable.game];
+                this.gameStatus.levelStatus = 2;
+                this.gameVariables.selectedMinigame.start();
+            }
+            const minigameWin = true; // this.gameStatus.minigameWin; TODO: this will be read from the minigame variable to keep the external minigame and the game sync
             // Add object and triggers
-            if(minigameWin) {
+            if(minigameWin === true) {
+                this.gameStatus.levelStatus = 1;
+
                 // Process prize
                 this.processResultPrize(this.gameVariables.currentInteractable.result);
                 // Final message
-                this.processDialog(this.gameVariables.currentInteractable.completedMessages);
+                this.processDialog(this.gameVariables.currentInteractable.completedMessages, () => {
+                    this.gameStatus.minigameWin = undefined;
+                    this.gameVariables.selectedMinigame = null;
+                });
+            } else if(minigameWin === false) {
+                this.gameStatus.levelStatus = 1;
+
+                // Retry message
+                this.processDialog(this.gameVariables.currentInteractable.retryMessages, () => {
+                    this.gameStatus.minigameWin = undefined;
+                    this.gameVariables.selectedMinigame = null;
+                });
             }
+            // If still undefined do nothing and continue the minigame
         }, () => {
             this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
         });

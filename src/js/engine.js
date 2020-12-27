@@ -53,12 +53,14 @@ class beAdventureEngine {
             triggers: {},
             questions: {},
             staticTexts: {},
+            minigames: {},
             interactableAuraOn: null,
             currentMap: 0,
             currentMusic: '',
             currentInteractable: null,
             currentDialog: null,
-            inventoryTooltip: null
+            inventoryTooltip: null,
+            selectedMinigame: null,
         };
 
         // ==== Start fixing Dpi from here and then in game-loop
@@ -82,6 +84,14 @@ class beAdventureEngine {
         this.mapManager.loadLevel(number);
         // ==== Start animation loop
         requestAnimationFrame((time) => this.gameLoop(time));
+    }
+
+    registerMiniGame(name, miniGame) {
+        this.gameVariables.minigames[name] = new miniGame(
+            this.gameCanvas, this.gameWidth, this.gameHeight, this.settings, this.soundSystem,
+            this.spriteManager, this.fontManager, this.mapManager, this.mouseManager, this.interactableManager,
+            this.gameStatus, this.gameVariables
+        );
     }
 
     gameLoop(time) {
@@ -109,6 +119,7 @@ class beAdventureEngine {
             switch (this.gameStatus.levelStatus) {
                 case 0: this.animateLoader(); break;
                 case 1: this.animateMap(); break;
+                case 2: this.gameVariables.selectedMinigame.animate(time);
             }
         }
 
@@ -116,6 +127,7 @@ class beAdventureEngine {
         switch (this.gameStatus.levelStatus) {
             case 0: this.drawLoader(); break;
             case 1: this.drawMap(); break;
+            case 2: this.gameVariables.selectedMinigame.draw(time);
         }
     }
 
@@ -139,7 +151,7 @@ class beAdventureEngine {
         this.gameCanvas.getContext('2d').fillStyle = "#000000";
         this.gameCanvas.getContext('2d').fillRect(0, 0, this.gameWidth, this.gameHeight);
         const loading = this.spriteManager.getSprite('Loading');
-        if(loading !== undefined) {
+        if(loading !== undefined && loading !== null) {
             this.gameCanvas.getContext('2d').drawImage(
                 loading.graphics,
                 loading.subSprite.sx, loading.subSprite.sy, loading.subSprite.width, loading.subSprite.height,

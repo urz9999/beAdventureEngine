@@ -2,5 +2,5 @@
 
 
 html { background: black; }
-canvas { width: 100%; height: 100%; }
+canvas { width: 100%; height: 100%; touch-action:none; user-select:none; }
 div { border: 3px solid red; background: white; padding: 0; margin: auto; display: block; width: 1000px; height: 480px; }

@@ -30,6 +30,16 @@ class MouseManager {
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
 
+        // Pass control to the the minigame
+        if(this.gameStatus.levelStatus === 2) {
+            if(this.gameVariables.selectedMinigame !== undefined) {
+                this.gameVariables.selectedMinigame.processMovement(canvasX, canvasY);
+            } else {
+                throw new Error("You need to launch a minigame in this state,please verify");
+            }
+            return;
+        }
+
         if(!this.gameStatus.showInventory && !this.gameStatus.doingQuestion) {
             const foundInteractable = this.overInteractable(canvasX, canvasY);
             if(foundInteractable !== null) {
@@ -70,13 +80,22 @@ class MouseManager {
     }
 
     processClicks(event) {
-        if(this.gameStatus.blockMouseAction || this.gameStatus.walkingToInteractable) { return; }
-
         const playerSprite = this.spriteManager.getSprite('main').subSprite;
-
         const rect = this.gameCanvas.getBoundingClientRect();
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
+
+        // Pass control to the the minigame
+        if(this.gameStatus.levelStatus === 2) {
+            if(this.gameVariables.selectedMinigame !== undefined) {
+                this.gameVariables.selectedMinigame.processClicks(canvasX, canvasY);
+            } else {
+                throw new Error("You need to launch a minigame in this state,please verify");
+            }
+            return;
+        }
+
+        if(this.gameStatus.blockMouseAction || this.gameStatus.walkingToInteractable) { return; }
 
         this.gameVariables.player.clickedX = canvasX;
 
