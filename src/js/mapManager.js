@@ -4,12 +4,17 @@ class MapManager {
 
     gameStatus;
     gameVariables;
+    gameWidth;
+    gameHeight;
 
     spriteManager;
     soundSystem;
 
-    constructor(gameStatus, gameVariables, spriteManager, soundSystem) {
+    constructor(gamewidth, gameHeight, gameStatus, gameVariables, spriteManager, soundSystem) {
         this.map = {};
+
+        this.gameWidth = gamewidth;
+        this.gameHeight = gameHeight;
         this.gameStatus = gameStatus;
         this.gameVariables = gameVariables;
 
@@ -84,26 +89,51 @@ class MapManager {
         this.gameVariables.characters = map.characters;
         this.gameVariables.interactables = this.filterInteractablesFromInventory(map.interactables);
         this.gameVariables.staticTexts = map.staticTexts;
-        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialLocation: spawnLocation || map.startingPoint }
+        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialOffsetX: 0 }
 
         // Load all textures
         const waiter = setInterval(() => {
             if(this.spriteManager.allSpriteLoaded()) {
                 // Set main position
                 const startingLocation = spawnLocation || map.startingPoint;
+
+                // Fix for over game width positions
+                let initialOffsetX = 0;
+                if (startingLocation[0] > this.gameWidth) {
+                    while (startingLocation[0] > this.gameWidth) {
+                        startingLocation[0] -= this.gameWidth;
+                        initialOffsetX -= this.gameWidth;
+                    }
+                }
+                this.gameVariables.player.initialOffsetX = initialOffsetX;
+
                 this.spriteManager.getSprite('main').setCoords(startingLocation[0], startingLocation[1]);
 
                 // Set character position
                 for(let i = 0; i < this.gameVariables.characters.length; i++) {
                     const char = this.gameVariables.characters[i];
-                    this.spriteManager.getSprite(char.name).setCoords(char.x, char.y);
+                    this.spriteManager.getSprite(char.name).setCoords(char.x + initialOffsetX, char.y);
                 }
 
                 // Set objects position
                 for(let i = 0; i < this.gameVariables.objects.length; i++) {
                     const obj = this.gameVariables.objects[i];
-                    this.spriteManager.getSprite(obj.name).setCoords(obj.x, obj.y);
+                    this.spriteManager.getSprite(obj.name).setCoords(obj.x + initialOffsetX, obj.y);
                 }
+
+                // Set interactable position
+                for(let i = 0; i < this.gameVariables.interactables.length; i++) {
+                    const interactable = this.gameVariables.interactables[i];
+                    interactable.x = interactable.x + initialOffsetX;
+                }
+
+                // Set background  position
+                const bgR = this.spriteManager.getSprite('BG_R');
+                bgR.x = bgR.x + initialOffsetX;
+                const bgM = this.spriteManager.getSprite('BG_M');
+                bgM.x = bgM.x + initialOffsetX;
+                const bgF = this.spriteManager.getSprite('BG_F');
+                bgF.x = bgF.x + initialOffsetX;
 
                 // ==== Set status to map and start level
                 this.gameStatus.levelStatus = 1;

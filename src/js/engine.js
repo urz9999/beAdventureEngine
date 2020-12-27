@@ -33,6 +33,7 @@ class beAdventureEngine {
 
             doingQuestion: false,
             gamePaused: false,
+            correctingView: false,
 
             blockMouseAction: false,
             processInteractable: false,
@@ -42,7 +43,7 @@ class beAdventureEngine {
         };
 
         this.gameVariables = {
-            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false, initialLocation: [0, 0] },
+            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false, initialOffsetX: 0 },
             objects: [],
             characters: [],
             inventory: [],
@@ -58,12 +59,15 @@ class beAdventureEngine {
             inventoryTooltip: null
         };
 
+        // ==== Start fixing Dpi from here and then in game-loop
+        this.fixDpi();
+
         // ==== Respect this order to avoid circular dependencies ======
         this.settings = new Settings();
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables);
-        this.mapManager = new MapManager(this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
+        this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
         this.interactableManager = new InteractableManager(this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
     }
@@ -373,6 +377,7 @@ class beAdventureEngine {
         }
 
         // Player animations
+        const speed = 10;
         const player = this.spriteManager.getSprite('main');
         const bgR = this.spriteManager.getSprite('BG_R');
         const bgM = this.spriteManager.getSprite('BG_M');
@@ -385,58 +390,129 @@ class beAdventureEngine {
             case 'walking': !direction ? player.playLeftWalking() : player.playRightWalking(); break;
             case 'talking': !direction ? player.playleftTalking() : player.playRightTalking(); break;
         }
-        if(animation === 'walking') {
+
+        if(animation === 'walking' || this.gameStatus.correctingView) {
             // process movement
             const x = player.getCoords().x;
             if(
-                (direction === false && x >= this.gameVariables.player.reachX - 2 * player.subSprite.width) ||
-                (direction === true  && x < (this.gameVariables.player.reachX + player.subSprite.width))
+                !this.gameStatus.correctingView && (
+                (direction === false && x >= this.gameVariables.player.reachX - player.subSprite.width) ||
+                (direction === true  && x < (this.gameVariables.player.reachX)))
             ) {
-                // Move player: added fix for offset movement on object on the scene
-                this.gameVariables.player.reachX = this.gameVariables.player.reachX - (direction ? 20.0 : -20.0);
-                const initialX = this.gameVariables.player.initialLocation[0] * 0.5;
-                const newX = x + (direction ? 20.0 : -20.0);
-                player.setCoords(newX, player.getCoords().y);
+                // Move player
+                let shift = (direction ? speed : -speed);
+
+                this.gameVariables.player.reachX = this.gameVariables.player.reachX - shift;
+
+                player.setCoords(this.lerp(player.getCoords().x + shift, this.gameVariables.player.reachX, 0.1), player.getCoords().y);
 
                 // ==== Move background, characters, interaction according to player
+                if(bgM.getCoords().x + speed > 0 && !direction) {
+                    shift = - bgM.getCoords().x;
+                }
+                if((bgM.getCoords().x + bgM.width - speed < this.gameWidth) && direction) {
+                    shift = - (bgM.getCoords().x + bgM.width - this.gameWidth);
+                }
+
                 // === Backgrounds
-                if(bgR.width > this.gameWidth) { bgR.setCoords(- newX * 0.3 - initialX, bgR.getCoords().y); }
-                if(bgM.width > this.gameWidth) { bgM.setCoords(- newX * 0.5 - initialX, bgM.getCoords().y); }
-                if(bgF.width > this.gameWidth) { bgF.setCoords(- newX * 0.7 - initialX, bgF.getCoords().y); }
+                if(bgR.width > this.gameWidth) { bgR.setCoords(bgR.getCoords().x - shift * 0.7, bgR.getCoords().y); }
+                if(bgM.width > this.gameWidth) { bgM.setCoords(bgM.getCoords().x - shift, bgM.getCoords().y); }
+                if(bgF.width > this.gameWidth) { bgF.setCoords(bgF.getCoords().x - shift * 1.2, bgF.getCoords().y); }
 
                 // === Characters
                 if(bgM.width > this.gameWidth) {
                     for (let i = 0; i < this.gameVariables.characters.length; i++) {
                         const name = this.gameVariables.characters[i].name;
                         const char = this.spriteManager.getSprite(name);
-                        char.setCoords(char.getCoords().x - (direction ? 20.0 : -20.0) * 0.5 - initialX, char.getCoords().y);
+                        char.setCoords(char.getCoords().x - shift, char.getCoords().y);
                     }
                     // === Objects
                     for (let i = 0; i < this.gameVariables.objects.length; i++) {
                         const name = this.gameVariables.objects[i].name;
                         const obj = this.spriteManager.getSprite(name);
-                        obj.setCoords(obj.getCoords().x - (direction ? 20.0 : -20.0) * 0.5 - initialX, obj.getCoords().y);
+                        obj.setCoords(obj.getCoords().x - shift, obj.getCoords().y);
                     }
                     // === Interactions
                     for (let i = 0; i < this.gameVariables.interactables.length; i++) {
                         const interactable = this.gameVariables.interactables[i];
-                        interactable.x = interactable.x - (direction ? 20.0 : -20.0) * 0.5 - initialX;
+                        interactable.x = interactable.x - shift;
                     }
                 }
-
-                // After first time stop using its contribution
-                this.gameVariables.player.initialLocation[0] = 0;
 
                 // Set cursor as move
                 this.gameStatus.cursor = 'move';
             } else {
-                // reached destination: return idle and enable clicks
+                // reached destination: return idle
                 this.gameVariables.player.animation = 'idle';
-
                 this.gameStatus.cursor = 'standard';
-                this.gameStatus.blockMouseAction = false;
-                this.gameStatus.walkingToInteractable = false;
+
+                // After moving adjust screen to put character at least near center screen to help reaching borders of game map
+                if(this.correctViewField()) {
+                    // ... and enable clicks
+                    this.gameStatus.blockMouseAction = false;
+                    this.gameStatus.walkingToInteractable = false;
+                    this.gameStatus.correctingView = false;
+                }
             }
         }
+    }
+
+    correctViewField() {
+        this.gameStatus.correctingView = true;
+
+        const player = this.spriteManager.getSprite('main');
+        const bgR = this.spriteManager.getSprite('BG_R');
+        const bgM = this.spriteManager.getSprite('BG_M');
+        const bgF = this.spriteManager.getSprite('BG_F');
+
+        const direction = (player.getCoords().x > this.gameWidth / 2);
+
+        if(bgM.getCoords().x === 0 || (bgM.getCoords().x + bgM.width === this.gameWidth)) {
+            this.gameStatus.correctingView = false;
+            return true;
+        }
+
+        if(Math.abs(this.gameWidth / 2 - player.getCoords().x) > 40) {
+
+            let shift = direction ? -50: 50;
+            if((bgM.getCoords().x + shift > 0) && !direction) {
+                shift = - bgM.getCoords().x;
+            }
+            if((bgM.getCoords().x + bgM.width - shift < this.gameWidth) && direction) {
+                shift = -(bgM.getCoords().x + bgM.width - this.gameWidth);
+            }
+
+            player.setCoords(player.getCoords().x + shift, player.getCoords().y);
+
+            // === Backgrounds
+            bgR.setCoords(bgR.getCoords().x + shift, bgR.getCoords().y);
+            bgM.setCoords(bgM.getCoords().x + shift, bgM.getCoords().y);
+            bgF.setCoords(bgF.getCoords().x + shift, bgF.getCoords().y);
+
+            // === Characters
+            for (let i = 0; i < this.gameVariables.characters.length; i++) {
+                const name = this.gameVariables.characters[i].name;
+                const char = this.spriteManager.getSprite(name);
+                char.setCoords(char.getCoords().x + shift, char.getCoords().y);
+            }
+            // === Objects
+            for (let i = 0; i < this.gameVariables.objects.length; i++) {
+                const name = this.gameVariables.objects[i].name;
+                const obj = this.spriteManager.getSprite(name);
+                obj.setCoords(obj.getCoords().x + shift, obj.getCoords().y);
+            }
+            // === Interactions
+            for (let i = 0; i < this.gameVariables.interactables.length; i++) {
+                const interactable = this.gameVariables.interactables[i];
+                interactable.x = interactable.x + shift;
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    lerp (start, end, amt){
+        return (1 - amt) * start + amt * end;
     }
 }

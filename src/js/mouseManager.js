@@ -75,6 +75,8 @@ class MouseManager {
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
 
+        this.gameVariables.player.clickedX = canvasX;
+
         // Inventory - Always process menu icons first
         if(this.overMenuIcon(canvasX, canvasY, 'InventoryIcon') && this.gameVariables.player.noplayer === false) {
             this.gameStatus.showInventory = !this.gameStatus.showInventory;
