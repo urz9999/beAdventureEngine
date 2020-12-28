@@ -69,7 +69,9 @@ class InteractableManager {
                 this.gameStatus.levelStatus = 2;
                 this.gameVariables.selectedMinigame.start();
             }
-            const minigameWin = true; // this.gameStatus.minigameWin; TODO: this will be read from the minigame variable to keep the external minigame and the game sync
+            // this will be read from the minigame variable to keep the external minigame and the game sync
+            const minigameWin = this.gameStatus.minigameWin;
+
             // Add object and triggers
             if(minigameWin === true) {
                 this.gameStatus.levelStatus = 1;

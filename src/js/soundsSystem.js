@@ -21,9 +21,32 @@ class SoundSystem {
         });
     }
 
+    playSoundByPath(path) {
+        this.getFile(path).then(snd => {
+            // check if context is in suspended state (autoplay policy)
+            if (this.soundCtx.state === 'suspended') {
+                this.soundCtx.resume();
+            }
+            this.playTrack(snd);
+        });
+    }
+
     playBackgroundMusic(name) {
         this.stopBackgroundMusic();
         this.loadFile('assets/musics/' + name).then(track => {
+            // check if context is in suspended state (autoplay policy)
+            if (this.audioCtx.state === 'suspended') {
+                this.audioCtx.resume();
+            }
+
+            this.music = this.playTrack(track);
+            this.music.loop = true;
+        });
+    }
+
+    playBackgroundMusicByPath(path) {
+        this.stopBackgroundMusic();
+        this.loadFile(path).then(track => {
             // check if context is in suspended state (autoplay policy)
             if (this.audioCtx.state === 'suspended') {
                 this.audioCtx.resume();
