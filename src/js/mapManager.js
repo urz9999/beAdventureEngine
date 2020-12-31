@@ -98,11 +98,14 @@ class MapManager {
         this.gameVariables.characters = map.characters;
         this.gameVariables.interactables = this.filterInteractablesFromInventory(map.interactables);
         this.gameVariables.staticTexts = map.staticTexts;
-        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialOffsetX: 0 }
+        this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialOffsetX: 0, cam: 0 }
 
         // Load all textures
         const waiter = setInterval(() => {
             if(this.spriteManager.allSpriteLoaded()) {
+                // Check if we need to set the camera as moving
+                this.gameVariables.isMapBiggerThanCanvas = this.spriteManager.getSprite('BG_M').width > this.gameWidth;
+
                 // Set main position
                 const startingLocation = spawnLocation || map.startingPoint;
 

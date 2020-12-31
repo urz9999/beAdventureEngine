@@ -157,8 +157,9 @@ class MouseManager {
                         // Just move in a direction
                         this.gameStatus.cursor = 'move';
                         this.gameVariables.player.animation = 'walking';
-                        this.gameVariables.player.direction = canvasX > playerSprite.dx;
-                        this.gameVariables.player.reachX = canvasX;
+                        this.gameVariables.player.direction = (this.gameVariables.player.noplayer ? canvasX : canvasX + this.gameVariables.player.cam) > playerSprite.dx;
+                        this.gameVariables.player.reachX = this.gameVariables.player.noplayer ? canvasX : canvasX + this.gameVariables.player.cam;
+                        console.log(this.gameVariables.player.reachX);
                         this.gameStatus.blockMouseAction = true;
                     } else {
                         this.interactableManager.processClicksForEvents();
@@ -223,8 +224,13 @@ class MouseManager {
     overInteractable(canvasX, canvasY) {
         for(let i = 0; i < this.gameVariables.interactables.length; i++) {
             const interactable = Object.assign({}, this.gameVariables.interactables[i]);
+
+            // Correct by player cam if needed as this only servers when the player is active
+            // Also this serves only here because the other element on the UI are 0-translated again
+            const translatedX = this.gameVariables.player.noplayer ? canvasX : canvasX + this.gameVariables.player.cam;
+
             if(
-                canvasX > interactable.x && canvasX < (interactable.x + interactable.width) &&
+                translatedX > interactable.x && translatedX < (interactable.x + interactable.width) &&
                 canvasY > interactable.y && canvasY < (interactable.y + interactable.height)
             ) {
                 return interactable;
@@ -239,12 +245,10 @@ class MouseManager {
         if(questionData !== undefined && questionData.boundingBoxes !== undefined) {
             for(let i = 0; i < questionData.boundingBoxes.length; i++) {
                 const boundingBox = questionData.boundingBoxes[i];
-                console.log(canvasX, canvasY, boundingBox);
                 if(
                     canvasX > boundingBox.x && canvasX < (boundingBox.x + boundingBox.width) &&
                     canvasY > boundingBox.y && canvasY < (boundingBox.y + boundingBox.height)
                 ) {
-                    console.log('return ', i);
                     return i;
                 }
             }

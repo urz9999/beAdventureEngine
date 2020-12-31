@@ -45,7 +45,7 @@ class beAdventureEngine {
         };
 
         this.gameVariables = {
-            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false, initialOffsetX: 0 },
+            player: { direction: 1, animation: 'idle', reachX: 0, noplayer: false, initialOffsetX: 0, cam: 0 },
             objects: [],
             characters: [],
             inventory: [],
@@ -57,6 +57,7 @@ class beAdventureEngine {
             interactableAuraOn: null,
             currentMap: 0,
             currentMusic: '',
+            isMapBiggerThanCanvas: false,
             currentInteractable: null,
             currentDialog: null,
             inventoryTooltip: null,
@@ -144,7 +145,7 @@ class beAdventureEngine {
         this.gameHeight = this.gameCanvas.parentElement.clientHeight;
 
         // ==== scale all the canvas to the dpi value ===
-        this.gameCanvas.getContext('2d').scale(dpi, dpi);
+        this.gameCanvas.getContext('2d').setTransform(dpi,0,0,dpi,0,0);
     }
 
     drawLoader() {
@@ -163,8 +164,25 @@ class beAdventureEngine {
     drawMap() {
         // Basic buffer
         const ctx = this.gameCanvas.getContext('2d');
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
+
+        // Save the state before translations
+        ctx.save();
+
+        // Apply special translation here if needed
+        if(!this.gameVariables.player.noplayer && this.gameVariables.isMapBiggerThanCanvas) {
+            const player = this.spriteManager.getSprite('main');
+            let cam = player.subSprite.dx + player.subSprite.width / 2 - this.gameWidth / 2;
+
+            // check deadzones
+            if(cam <= 0) cam = 0;
+            if(cam >= this.gameWidth) cam = this.gameWidth;
+
+            // Save it for later uses
+            this.gameVariables.player.cam = cam;
+
+            // Apply on viewport
+            ctx.translate(-cam, 0);
+        }
 
         // Backgrounds
         const bgR = this.spriteManager.getSprite('BG_R');
@@ -216,9 +234,27 @@ class beAdventureEngine {
             );
         }
 
+        // If debug is active show interactable bounding boxes
+        if(this.settings.debug) {
+            // === Interactions
+            for (let i = 0; i < this.gameVariables.interactables.length; i++) {
+                ctx.beginPath();
+                ctx.rect(
+                    this.gameVariables.interactables[i].x,
+                    this.gameVariables.interactables[i].y,
+                    this.gameVariables.interactables[i].width,
+                    this.gameVariables.interactables[i].height
+                );
+                ctx.stroke();
+            }
+        }
+
         // Foreground
         const bgF = this.spriteManager.getSprite('BG_F');
         ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + this.mapManager.map.bg_F_offset, bgF.width, bgF.height);
+
+        // Before painting UI restore the context
+        ctx.restore();
 
         // Ui - Dialog Box
         if(this.gameVariables.currentDialog !== null) {
@@ -394,12 +430,9 @@ class beAdventureEngine {
         // Player animations
         const speed = 10;
         const player = this.spriteManager.getSprite('main');
-        const bgR = this.spriteManager.getSprite('BG_R');
-        const bgM = this.spriteManager.getSprite('BG_M');
-        const bgF = this.spriteManager.getSprite('BG_F');
-
         const direction = this.gameVariables.player.direction;
         const animation = this.gameVariables.player.animation;
+
         switch (animation) {
             case 'idle': !direction ? player.playLeftIdle() : player.playRightIdle(); break;
             case 'walking': !direction ? player.playLeftWalking() : player.playRightWalking(); break;
@@ -409,121 +442,27 @@ class beAdventureEngine {
         if(animation === 'walking' || this.gameStatus.correctingView) {
             // process movement
             const x = player.getCoords().x;
-            if(
-                !this.gameStatus.correctingView && (
-                (direction === false && x >= this.gameVariables.player.reachX - player.subSprite.width) ||
-                (direction === true  && x < (this.gameVariables.player.reachX)))
-            ) {
+            console.log("playerX: ",x );
+            if( (direction === false && x >= this.gameVariables.player.reachX) || (direction === true  && x < (this.gameVariables.player.reachX)) ) {
                 // Move player
                 let shift = (direction ? speed : -speed);
 
                 this.gameVariables.player.reachX = this.gameVariables.player.reachX - shift;
-
                 player.setCoords(this.lerp(player.getCoords().x + shift, this.gameVariables.player.reachX, 0.1), player.getCoords().y);
-
-                // ==== Move background, characters, interaction according to player
-                if(bgM.getCoords().x + speed > 0 && !direction) {
-                    shift = - bgM.getCoords().x;
-                }
-                if((bgM.getCoords().x + bgM.width - speed < this.gameWidth) && direction) {
-                    shift = - (bgM.getCoords().x + bgM.width - this.gameWidth);
-                }
-
-                // === Backgrounds
-                if(bgR.width > this.gameWidth) { bgR.setCoords(bgR.getCoords().x - shift * 0.7, bgR.getCoords().y); }
-                if(bgM.width > this.gameWidth) { bgM.setCoords(bgM.getCoords().x - shift, bgM.getCoords().y); }
-                if(bgF.width > this.gameWidth) { bgF.setCoords(bgF.getCoords().x - shift * 1.2, bgF.getCoords().y); }
-
-                // === Characters
-                if(bgM.width > this.gameWidth) {
-                    for (let i = 0; i < this.gameVariables.characters.length; i++) {
-                        const name = this.gameVariables.characters[i].name;
-                        const char = this.spriteManager.getSprite(name);
-                        char.setCoords(char.getCoords().x - shift, char.getCoords().y);
-                    }
-                    // === Objects
-                    for (let i = 0; i < this.gameVariables.objects.length; i++) {
-                        const name = this.gameVariables.objects[i].name;
-                        const obj = this.spriteManager.getSprite(name);
-                        obj.setCoords(obj.getCoords().x - shift, obj.getCoords().y);
-                    }
-                    // === Interactions
-                    for (let i = 0; i < this.gameVariables.interactables.length; i++) {
-                        const interactable = this.gameVariables.interactables[i];
-                        interactable.x = interactable.x - shift;
-                    }
-                }
 
                 // Set cursor as move
                 this.gameStatus.cursor = 'move';
             } else {
+
                 // reached destination: return idle
                 this.gameVariables.player.animation = 'idle';
                 this.gameStatus.cursor = 'standard';
 
-                // After moving adjust screen to put character at least near center screen to help reaching borders of game map
-                if(this.correctViewField()) {
-                    // ... and enable clicks
-                    this.gameStatus.blockMouseAction = false;
-                    this.gameStatus.walkingToInteractable = false;
-                    this.gameStatus.correctingView = false;
-                }
+                // ... and enable clicks
+                this.gameStatus.blockMouseAction = false;
+                this.gameStatus.walkingToInteractable = false;
+                this.gameStatus.correctingView = false;
             }
-        }
-    }
-
-    correctViewField() {
-        this.gameStatus.correctingView = true;
-
-        const player = this.spriteManager.getSprite('main');
-        const bgR = this.spriteManager.getSprite('BG_R');
-        const bgM = this.spriteManager.getSprite('BG_M');
-        const bgF = this.spriteManager.getSprite('BG_F');
-
-        const direction = (player.getCoords().x > this.gameWidth / 2);
-
-        if(bgM.getCoords().x === 0 || (bgM.getCoords().x + bgM.width === this.gameWidth)) {
-            this.gameStatus.correctingView = false;
-            return true;
-        }
-
-        if(Math.abs(this.gameWidth / 2 - player.getCoords().x) > 40) {
-
-            let shift = direction ? -50: 50;
-            if((bgM.getCoords().x + shift > 0) && !direction) {
-                shift = - bgM.getCoords().x;
-            }
-            if((bgM.getCoords().x + bgM.width - shift < this.gameWidth) && direction) {
-                shift = -(bgM.getCoords().x + bgM.width - this.gameWidth);
-            }
-
-            player.setCoords(player.getCoords().x + shift, player.getCoords().y);
-
-            // === Backgrounds
-            bgR.setCoords(bgR.getCoords().x + shift, bgR.getCoords().y);
-            bgM.setCoords(bgM.getCoords().x + shift, bgM.getCoords().y);
-            bgF.setCoords(bgF.getCoords().x + shift, bgF.getCoords().y);
-
-            // === Characters
-            for (let i = 0; i < this.gameVariables.characters.length; i++) {
-                const name = this.gameVariables.characters[i].name;
-                const char = this.spriteManager.getSprite(name);
-                char.setCoords(char.getCoords().x + shift, char.getCoords().y);
-            }
-            // === Objects
-            for (let i = 0; i < this.gameVariables.objects.length; i++) {
-                const name = this.gameVariables.objects[i].name;
-                const obj = this.spriteManager.getSprite(name);
-                obj.setCoords(obj.getCoords().x + shift, obj.getCoords().y);
-            }
-            // === Interactions
-            for (let i = 0; i < this.gameVariables.interactables.length; i++) {
-                const interactable = this.gameVariables.interactables[i];
-                interactable.x = interactable.x + shift;
-            }
-            return false;
-        } else {
-            return true;
         }
     }
 
