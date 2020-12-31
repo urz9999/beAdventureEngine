@@ -2,6 +2,70 @@
   "name": "Bar",
   "interactables": [
     {
+      "type": "dialog",
+      "linked": "slime",
+      "x": 450,
+      "y": 270,
+      "width": 83,
+      "height": 56,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ciao, sei uno slime!"
+        },
+        {
+          "type": "other",
+          "name": "Slime the Green!",
+          "portrait": "slime",
+          "text": "Incredibile da cosa l'hai scoperto? Vabbè sono qua per dirti una cosa pazzesca!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Davvero? Cosa? Che la terra è rotonda?"
+        },
+        {
+          "type": "other",
+          "name": "Slime the Green!",
+          "portrait": "slime",
+          "text": "NUO! Che puoi  utilizzare degli stilizzatori di testo nel dialogo!"
+        },
+        {
+          "type": "other",
+          "name": "Slime the Green!",
+          "portrait": "slime",
+          "text": "Guarda: §bio sono bold§r, §iio sono italic§r, §1io colorato§0, §i§1io italic e colorato§0§r!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ma hai un'aura straordineeeria! Come hai fatto?"
+        },
+        {
+          "type": "other",
+          "name": "Slime the Green!",
+          "portrait": "slime",
+          "text": "E' sufficiente usare il simbolo § con r (regular), i (italic) o b (bold), oppure con 0-9 per i colori (0 è quello base bianco)"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Uhm e poi devo ricordarmi di resettarli giusto? Sempre usando §, così: §b§5test§0§r."
+        },
+        {
+          "type": "other",
+          "name": "Slime the Green!",
+          "portrait": "slime",
+          "text": "Molto bene! Fai riferimento al gioco di esempio per vedere come abbiamo fatto in questo dialogo!"
+        }
+      ]
+    },
+    {
       "type": "exit",
       "linked": "door",
       "x": 200,
@@ -24,14 +88,14 @@
       ],
       "result": [
         { "trigger": 1 },
-        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco di Dorothy!" } }
+        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco dato da Dorothy!" } }
       ],
       "notMetMessages": [
         {
           "type": "other",
           "name": "Dorothy MK VII",
           "portrait": "dorothy",
-          "text": "Ueeeh non riesco a recuperare una pozione di energia!!"
+          "text": "Ueeeh, ueeeh, non riesco a recuperare una §b§1pozione§0§r di energia!!"
         },
         {
           "type": "self",
@@ -63,19 +127,19 @@
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Mica ti ho detto che era gratis! Sgancia una ricompensa ammasso di bulloni e ingranaggi!"
+          "text": "Ho bisogno anch'io di aiuto! Un mostro potente e mostruoso (ovviamente) mi impedisce di accedere alla sfida finale!"
         },
         {
           "type": "other",
           "name": "Dorothy MK VII",
           "portrait": "dorothy",
-          "text": "Ti ho lasciato un pass per partecipare alla sfida di Brain Face! Vedi di vincere!"
+          "text": "Penso di poterti aiutare! Ecco un pass per partecipare alla sfida di Brain Face! Vedi di vincere!"
         },
         {
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Assolutamente! Perchè la capra è l'animale migliore di sempre...dopo... la Donna!"
+          "text": "Assolutamente! Perchè sono la migliore! Cioè the best of the best, insomma, farò testare il minigioco agli sviluppatori!"
         }
       ]
     }
@@ -87,6 +151,13 @@
       "frames": 2,
       "x": 900,
       "y": 385
+    },
+    {
+      "name": "slime",
+      "sWidth": 83,
+      "frames": 4,
+      "x": 450,
+      "y": 270
     }
   ],
   "objects": [

@@ -71,7 +71,7 @@ class beAdventureEngine {
         this.settings = new Settings();
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
-        this.fontManager = new FontManager(this.gameVariables);
+        this.fontManager = new FontManager(this.gameVariables, this.settings);
         this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
         this.interactableManager = new InteractableManager(this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
@@ -442,7 +442,7 @@ class beAdventureEngine {
         if(animation === 'walking' || this.gameStatus.correctingView) {
             // process movement
             const x = player.getCoords().x;
-            console.log("playerX: ",x );
+
             if( (direction === false && x >= this.gameVariables.player.reachX) || (direction === true  && x < (this.gameVariables.player.reachX)) ) {
                 // Move player
                 let shift = (direction ? speed : -speed);

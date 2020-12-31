@@ -18,13 +18,13 @@
           "type": "other",
           "portrait": "brainface",
           "name": "Brain Face",
-          "text": "Ohohohohoho misero umanoide tettuto di cromosomi XX! Non hai il pass per poter accedere alla mia sfida!"
+          "text": "Ohohohohoho misero umanoide fornito di cromosomi XX! Non hai il pass per poter accedere alla mia sfida finale!"
         },
         {
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Ah! Sessismo! Vieni vieni! Che tanto non ti faccio niente! Dai!"
+          "text": "Ah! Infido mostro alieno! Vieni vieni! Che tanto non ti faccio niente! Dai!"
         },
         {
           "type": "other",
@@ -50,7 +50,7 @@
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "E' ovvio! In un mondo governato dal politically correct, devo ergermi a baluardo del... sti gran c***i! Io faccio da sola!"
+          "text": "E' ovvio! In un mondo governato dal punk e dal cyber, devo ergermi a baluardo dell'umanità!"
         },
         {
           "type": "other",
@@ -62,7 +62,7 @@
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Uuuuh yeah! E mi raccomando! non fare lo stronzetto!"
+          "text": "Uuuuh yeah! E a tutti gli sviluppatori ricordate: l'interactable openurl permette di puntare ad un form per il CRM!"
         }
       ],
       "retryMessages": [
@@ -91,13 +91,13 @@
         {
           "type": "other",
           "name": "Buttafuori avido",
-          "text": "Uè bella frugna ce l'hai il denaro? E ricordati che la leva va tirata eh! Altrimenti stai a casa!"
+          "text": "Uè donna, ce l'hai il denaro? E ricordati che la leva va tirata eh! Altrimenti non puoi entrare!"
         },
         {
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Che volgare! Vabbè 'speta nè, che faccio, BALUBA!"
+          "text": "Che volgare! Vabbè ho capito!"
         }
       ]
     },
@@ -139,7 +139,7 @@
           "type": "other",
           "name": "Eri Kasamoto",
           "portrait": "eri",
-          "text": "Sto per farti provare il sistema a domande! Ora vado!"
+          "text": "Sto per farti provare il sistema a domande! Ora vado! Ps: fai riferimento al template per maggiori informazioni"
         }
       ],
       "goodAnswerMessages": [
@@ -197,7 +197,7 @@
           "type": "self",
           "name": "Madeline",
           "portrait": "main",
-          "text": "Una pozione! Mi servirà!"
+          "text": "Una pozione! Sento che mi servirà!"
         }
       ]
     },
