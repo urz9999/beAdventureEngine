@@ -35,6 +35,7 @@ class MapManager {
 
         const map = await this.loadMap(`map${number}`);
 
+        this.gameVariables.mapName = map.name;
         this.gameVariables.currentMap = number;
         this.gameVariables.currentMusic = map.startingMusic;
 
@@ -54,6 +55,7 @@ class MapManager {
         this.spriteManager.readSprite('DialogBox', `assets/images/ui/menu/dialog.png`);
         this.spriteManager.readSprite('Tooltip', `assets/images/ui/menu/tooltip.png`);
         this.spriteManager.readSprite('Question', `assets/images/ui/menu/question.png`);
+        this.spriteManager.readSprite('Location', `assets/images/ui/menu/location.png`);
 
         // Load main character
         this.spriteManager.readMainCharacter();
@@ -156,7 +158,12 @@ class MapManager {
     }
 
     startLevel() {
+        this.gameVariables.showMapName = true;
         this.soundSystem.playBackgroundMusic(this.gameVariables.currentMusic);
+        const mapWaiter = setTimeout(() => {
+            this.gameVariables.showMapName = false;
+            clearTimeout(mapWaiter);
+        }, 3000);
     }
 
     filterObjectsFromInventory(objects) {

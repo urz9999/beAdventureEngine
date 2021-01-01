@@ -88,7 +88,8 @@
       ],
       "result": [
         { "trigger": 1 },
-        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco dato da Dorothy!" } }
+        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco dato da Dorothy!" } },
+        { "sound":  "pickup.wav" }
       ],
       "notMetMessages": [
         {

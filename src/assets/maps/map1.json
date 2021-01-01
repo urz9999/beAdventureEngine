@@ -119,7 +119,8 @@
         ],
         "result": [
           { "trigger": 1 },
-          { "object": { "name": "money", "description": "un pacco di soldi fruscianti per te!" } }
+          { "object": { "name": "money", "description": "un pacco di soldi fruscianti per te!" } },
+          { "sound":  "ding.wav" }
         ]
       },
       "messages": [
@@ -171,6 +172,7 @@
       "type": "interact",
       "linked": "lever",
       "trigger": "toggle",
+      "sound":  "ding.wav",
       "x": 430,
       "y": 410,
       "width": 41,
@@ -188,6 +190,7 @@
       "type": "object",
       "description": "una pozione misteriosa trovata sul terreno",
       "linked": "potion",
+      "sound":  "pickup.wav",
       "x": 780,
       "y": 405,
       "width": 20,

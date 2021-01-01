@@ -5,10 +5,12 @@ class InteractableManager {
 
     spriteManager;
     mapManager;
+    soundSystem;
 
     processTriggerSemaphore;
 
-    constructor(spriteManager, mapManager, gameStatus, gameVariables, gameCanvas) {
+    constructor(soundSystem, spriteManager, mapManager, gameStatus, gameVariables, gameCanvas) {
+        this.soundSystem = soundSystem;
         this.spriteManager = spriteManager;
         this.mapManager = mapManager;
 
@@ -102,6 +104,7 @@ class InteractableManager {
         this.processConditions(() => {
             // Add object and triggers
             this.processResultPrize(this.gameVariables.currentInteractable.result);
+
             // Final message
             this.processDialog(this.gameVariables.currentInteractable.completedMessages);
         }, () => {
@@ -264,7 +267,6 @@ class InteractableManager {
     }
 
     processTrigger() {
-        console.log('times called');
         const setOpposite = (value) => {
             if(value !== undefined) {
                 return (value === 1 ? 0 : 1);
@@ -277,6 +279,11 @@ class InteractableManager {
         const trigger = this.gameVariables.currentInteractable.trigger;
         this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] =
             (trigger === 'toggle' ? setOpposite(this.gameVariables.triggers[this.gameVariables.currentInteractable.linked]) : trigger);
+
+        // Play sound if exists
+        if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
+            this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
+        }
     }
 
     processDialog(mess, callback) {
@@ -353,6 +360,11 @@ class InteractableManager {
             this.gameVariables.inventory.push({ name: this.gameVariables.currentInteractable.linked, description: this.gameVariables.currentInteractable.description });
             this.gameVariables.interactables = this.gameVariables.interactables.filter(obj => obj.linked !== this.gameVariables.currentInteractable.linked);
             this.gameVariables.objects = this.gameVariables.objects.filter(obj => obj.name !== this.gameVariables.currentInteractable.linked);
+
+            // Play sound if exists
+            if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
+                this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
+            }
         }
     }
 
@@ -365,6 +377,7 @@ class InteractableManager {
             const trigger = results[i].trigger;
             const object = results[i].object;
             const wingame = results[i].wingame;
+            const sound = results[i].sound;
 
             if(trigger !== undefined) {
                 this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
@@ -378,6 +391,11 @@ class InteractableManager {
                 // Set wingame status to true: this will wait for current interactable
                 // to finish and then will change to credit scene
                 this.gameStatus.wingame = true;
+            }
+            if(sound !== undefined && results[i].soundPlayed === undefined) {
+                // Play sound if exists
+                this.soundSystem.playSound(sound);
+                results[i].soundPlayed = true;
             }
         }
     }

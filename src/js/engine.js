@@ -73,7 +73,7 @@ class beAdventureEngine {
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables, this.settings);
         this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
-        this.interactableManager = new InteractableManager(this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
+        this.interactableManager = new InteractableManager(this.soundSystem, this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
     }
 
@@ -401,6 +401,27 @@ class beAdventureEngine {
             }
             playIcon.x = this.gameWidth - 40 - inventoryIcon.width - playIcon.width;
             pauseIcon.x = this.gameWidth - 40 - inventoryIcon.width - pauseIcon.width;
+
+            // Ui - Location
+            if(this.gameVariables.showMapName) {
+                const location = this.spriteManager.getSprite('Location');
+                const locationText = this.gameVariables.mapName;
+                ctx.drawImage(location.graphics, 20, 10);
+                this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white');
+                this.gameVariables.mapNameOpacity = 1;
+            } else {
+                if(this.gameVariables.mapNameOpacity > 0) {
+                    const location = this.spriteManager.getSprite('Location');
+                    const locationText = this.gameVariables.mapName;
+
+                    this.gameVariables.mapNameOpacity = this.lerp(this.gameVariables.mapNameOpacity, 0, 0.3);
+
+                    ctx.globalAlpha = this.gameVariables.mapNameOpacity;
+                    ctx.drawImage(location.graphics, 20, 10);
+                    this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white');
+                    ctx.globalAlpha = 1;
+                }
+            }
         }
 
         // Ui - static texts
