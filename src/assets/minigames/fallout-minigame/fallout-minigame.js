@@ -120,10 +120,12 @@ class FalloutMinigame extends MiniGame {
         // Create terminal
         const terminalBackground = document.createElement("DIV");
         terminalBackground.id = "terminal-background";
+        terminalBackground.style.transform = `scale(${this.gameStatus.scale}, ${this.gameStatus.scale})`;
 
         const terminal = document.createElement("DIV");
         terminal.id = "terminal";
         terminal.innerHTML = layout;
+        terminal.style.transform = `scale(${this.gameStatus.scale}, ${this.gameStatus.scale})`;
 
         document.body.appendChild(terminalBackground);
         document.body.appendChild(terminal);

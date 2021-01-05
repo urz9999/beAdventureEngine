@@ -155,8 +155,8 @@ class beAdventurousEngine {
 
         // Set fullscreen if needed
         if(this.settings.fullscreen) {
-            this.gameCanvas.parentElement.style.width = '100%';
-            this.gameCanvas.parentElement.style.height = '100%';
+            this.gameCanvas.parentElement.style.width = `${document.documentElement.clientWidth}px`;
+            this.gameCanvas.parentElement.style.height = `${document.documentElement.clientHeight}px`;
 
             styleWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
             styleHeight = +getComputedStyle(this.gameCanvas).getPropertyValue("height").slice(0, -2);
