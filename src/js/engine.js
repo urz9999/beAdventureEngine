@@ -1,4 +1,4 @@
-class beAdventureEngine {
+class beAdventurousEngine {
 
     gameCanvas;
     gameWidth;
@@ -21,6 +21,13 @@ class beAdventureEngine {
         this.gameCanvas.addEventListener('mousedown', (event) => this.mouseManager.processMouse(event), false);
         this.gameCanvas.addEventListener('mousemove', (event) => this.mouseManager.processMouse(event), false);
 
+        // For fullscreen
+        document.addEventListener('keypress', (event) => {
+            if (event.code.toString() === 'KeyF') {
+                this.settings.fullscreen = !this.settings.fullscreen;
+            }
+        });
+
         this.gameStatus = {
             levelStatus: 0,
             lastTick: 0,
@@ -41,7 +48,10 @@ class beAdventureEngine {
             wingame: false,
             inCredits: false,
 
-            cursor: 'standard'
+            cursor: 'standard',
+            scale: 1,
+            originalWidth: 0,
+            originalHeight: 0
         };
 
         this.gameVariables = {
@@ -64,17 +74,21 @@ class beAdventureEngine {
             selectedMinigame: null,
         };
 
+        // Settings first
+        this.settings = new Settings();
+
         // ==== Start fixing Dpi from here and then in game-loop
+        this.gameStatus.originalWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
+        this.gameStatus.originalHeight = +getComputedStyle(this.gameCanvas).getPropertyValue("height").slice(0, -2);
         this.fixDpi();
 
         // ==== Respect this order to avoid circular dependencies ======
-        this.settings = new Settings();
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables, this.settings);
         this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
         this.interactableManager = new InteractableManager(this.soundSystem, this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
-        this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas);
+        this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas, this.gameWidth, this.gameHeight);
     }
 
     start(number) {
@@ -133,19 +147,39 @@ class beAdventureEngine {
     }
 
     fixDpi() {
+        let styleWidth, styleHeight;
+
         // ==== fix dpi to avoid blur ==================
         const dpi = window.devicePixelRatio;
-        const styleWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
-        const styleHeight = +getComputedStyle(this.gameCanvas).getPropertyValue("height").slice(0, -2);
-        this.gameCanvas.setAttribute('width', styleWidth * dpi);
-        this.gameCanvas.setAttribute('height', styleHeight * dpi);
         // ==============================================
 
-        this.gameWidth = this.gameCanvas.parentElement.clientWidth;
-        this.gameHeight = this.gameCanvas.parentElement.clientHeight;
+        // Set fullscreen if needed
+        if(this.settings.fullscreen) {
+            this.gameCanvas.parentElement.style.width = '100%';
+            this.gameCanvas.parentElement.style.height = '100%';
+
+            styleWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
+            styleHeight = +getComputedStyle(this.gameCanvas).getPropertyValue("height").slice(0, -2);
+
+            this.gameStatus.scale = styleWidth / this.gameStatus.originalWidth;
+        } else {
+            this.gameCanvas.parentElement.style.width = this.gameStatus.originalWidth + 'px';
+            this.gameCanvas.parentElement.style.height = this.gameStatus.originalHeight + 'px';
+
+            styleWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
+            styleHeight = +getComputedStyle(this.gameCanvas).getPropertyValue("height").slice(0, -2);
+
+            this.gameStatus.scale = 1;
+        }
+
+        this.gameCanvas.setAttribute('width', styleWidth * dpi);
+        this.gameCanvas.setAttribute('height', styleHeight * dpi);
+
+        this.gameWidth = this.gameCanvas.parentElement.clientWidth / this.gameStatus.scale;
+        this.gameHeight = this.gameCanvas.parentElement.clientHeight / this.gameStatus.scale;
 
         // ==== scale all the canvas to the dpi value ===
-        this.gameCanvas.getContext('2d').setTransform(dpi,0,0,dpi,0,0);
+        this.gameCanvas.getContext('2d').setTransform(dpi * this.gameStatus.scale,0,0,dpi * this.gameStatus.scale,0,0);
     }
 
     drawLoader() {
@@ -156,7 +190,7 @@ class beAdventureEngine {
             this.gameCanvas.getContext('2d').drawImage(
                 loading.graphics,
                 loading.subSprite.sx, loading.subSprite.sy, loading.subSprite.width, loading.subSprite.height,
-                this.gameWidth / 2 - 200, this.gameHeight / 2 - 150, loading.subSprite.width, loading.subSprite.height
+                this.gameWidth * 0.5 - 200, this.gameHeight * 0.5 - 150, loading.subSprite.width, loading.subSprite.height
             )
         }
     }

@@ -1,18 +1,22 @@
 class MouseManager {
 
     gameCanvas;
+    gameWidth;
+    gameHeight;
     gameStatus;
     gameVariables;
 
     spriteManager;
     interactableManager;
 
-    constructor(spriteManager, interactableManager, gameStatus, gameVariables, gameCanvas) {
+    constructor(spriteManager, interactableManager, gameStatus, gameVariables, gameCanvas, gameWidth, gameHeight) {
         this.spriteManager = spriteManager;
         this.interactableManager = interactableManager;
         this.gameStatus = gameStatus;
         this.gameVariables = gameVariables;
         this.gameCanvas = gameCanvas;
+        this.gameWidth = gameWidth;
+        this.gameHeight = gameHeight;
     }
 
     processMouse(event) {
@@ -27,8 +31,8 @@ class MouseManager {
 
     processMoves(event) {
         const rect = this.gameCanvas.getBoundingClientRect();
-        const canvasX = event.clientX - rect.left;
-        const canvasY = event.clientY - rect.top;
+        const canvasX = (event.clientX - rect.left) / this.gameStatus.scale;
+        const canvasY = (event.clientY - rect.top) / this.gameStatus.scale;
 
         // Pass control to the the minigame
         if(this.gameStatus.levelStatus === 2) {
@@ -82,8 +86,8 @@ class MouseManager {
     processClicks(event) {
         const playerSprite = this.spriteManager.getSprite('main').subSprite;
         const rect = this.gameCanvas.getBoundingClientRect();
-        const canvasX = event.clientX - rect.left;
-        const canvasY = event.clientY - rect.top;
+        const canvasX = (event.clientX - rect.left) / this.gameStatus.scale;
+        const canvasY = (event.clientY - rect.top) / this.gameStatus.scale;
 
         // Pass control to the the minigame
         if(this.gameStatus.levelStatus === 2) {
@@ -203,11 +207,13 @@ class MouseManager {
         const overallSpaceX = inventorySlot.width * 4 + 60;
         const overallSpaceY = inventorySlot.height * 4 + 60;
 
+        console.log(this.gameWidth, this.gameHeight);
+
         for(let j = 0; j < 4; j++) {
             for(let i = 0; i < 4; i++) {
 
-                const slotX = this.gameCanvas.parentElement.clientWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
-                const slotY = this.gameCanvas.parentElement.clientHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
+                const slotX = this.gameWidth / 2 - overallSpaceX / 2 + j * inventorySlot.width + j * 20;
+                const slotY = this.gameHeight / 2 - overallSpaceY / 2 + i * inventorySlot.height + i * 20;
 
                 if(
                     canvasX > slotX && canvasX < (slotX + inventorySlot.width) &&

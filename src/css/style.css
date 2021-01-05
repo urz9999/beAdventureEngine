@@ -1,7 +1,7 @@
 @font-face { font-family: starmap;  src: url('../assets/fonts/starmap.ttf'); }
 
 html { background: black; }
-body { height: 100%; }
+body { height: 100%; overflow: hidden; }
 canvas { width: 100%; height: 100%; touch-action:none; user-select:none; }
 div.main-game { background: black; padding: 0; margin: auto; display: block; width: 1000px; height: 480px; }
 

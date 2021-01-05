@@ -3,6 +3,7 @@ class Settings {
     gameTick;
     creditMap;
     debug;
+    fullscreen;
 
     color1;
     color2;
@@ -19,6 +20,7 @@ class Settings {
         this.gameTick = 6000;
         this.creditMap = 99;
         this.debug = false;
+        this.fullscreen = true;
 
         this.color1 = '#00faff';
         this.color2 = '#d000ff';
