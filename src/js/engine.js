@@ -300,7 +300,7 @@ class beAdventurousEngine {
             const text = this.gameVariables.currentDialog.text;
             const portrait = this.gameVariables.currentDialog.portrait;
 
-            this.fontManager. drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white');
+            this.fontManager.drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white');
 
             if(portrait !== undefined && portrait !== null) {
                 const faceSprite = this.spriteManager.getSprite(`${portrait}Face`);

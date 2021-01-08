@@ -18,7 +18,8 @@ class Settings {
     constructor() {
         this.fps = 30;
         this.gameTick = 6000;
-        this.creditMap = 99;
+        this.creditMap = 99; // Set here what map to use for credit
+
         this.debug = false;
         this.fullscreen = true;
 
