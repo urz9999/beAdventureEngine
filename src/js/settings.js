@@ -15,6 +15,8 @@ class Settings {
     color8;
     color9;
 
+    strokeColor;
+
     constructor() {
         this.fps = 30;
         this.gameTick = 6000;
@@ -32,5 +34,7 @@ class Settings {
         this.color7 = '#0022ff';
         this.color8 = '#56478c';
         this.color9 = '#8d8d8d';
+
+        this.strokeColor = '#353728'
     }
 }

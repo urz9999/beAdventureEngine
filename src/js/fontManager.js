@@ -20,7 +20,7 @@ class FontManager {
         const ctx = canvas.getContext("2d");
         const lineHeight = font.size * 1.2;
         const fitWidth = maxWidth || 0;
-        const fill = !stroke;
+        const fill = true;
 
         let words = text.split(' ');
         let currentLine = 0;
@@ -28,10 +28,11 @@ class FontManager {
 
         ctx.font = `${font.size}px ${fontName}`;
         ctx.fillStyle = color || font.color;
-        ctx.strokeStyle = color || font.color;
+        ctx.strokeStyle = this.settings.strokeColor;
         ctx.lineWidth = 2;
 
         if (fitWidth <= 0) {
+            if(stroke) this.drawStyledText(ctx, text, x, y, fontName, font.size, !fill);
             this.drawStyledText(ctx, text, x, y, fontName, font.size, fill);
             return;
         }
@@ -42,8 +43,8 @@ class FontManager {
             if (w > fitWidth) {
                 idx = (idx === 1 ? 2 : idx);
 
+                if(stroke) this.drawStyledText(ctx, words.slice(0, idx - 1).join(' '), x, y + (lineHeight * currentLine), fontName, font.size, !fill);
                 this.drawStyledText(ctx, words.slice(0, idx - 1).join(' '), x, y + (lineHeight * currentLine), fontName, font.size, fill);
-
                 currentLine++;
                 words = words.splice(idx - 1);
                 idx = 1;
@@ -52,6 +53,7 @@ class FontManager {
             }
         }
         if(idx > 0) {
+            if(stroke) this.drawStyledText(ctx, words.join(' '), x, y + (lineHeight * currentLine), fontName, font.size, !fill);
             this.drawStyledText(ctx, words.join(' '), x, y + (lineHeight * currentLine), fontName, font.size, fill);
         }
         return lineHeight * (currentLine + 1);

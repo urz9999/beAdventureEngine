@@ -300,15 +300,15 @@ class beAdventurousEngine {
             const text = this.gameVariables.currentDialog.text;
             const portrait = this.gameVariables.currentDialog.portrait;
 
-            this.fontManager.drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white');
+            this.fontManager.drawText(this.gameCanvas, 200, name, 310, 180, 'starmap', 'white', true);
 
             if(portrait !== undefined && portrait !== null) {
                 const faceSprite = this.spriteManager.getSprite(`${portrait}Face`);
                 ctx.drawImage(faceSprite.graphics, 310, 220, 64, 64);
 
-                this.fontManager. drawText(this.gameCanvas, 310, text, 390, 230, 'starmap', 'white');
+                this.fontManager. drawText(this.gameCanvas, 310, text, 390, 230, 'starmap', 'white', true);
             } else {
-                this.fontManager. drawText(this.gameCanvas, 390, text, 310, 230, 'starmap', 'white');
+                this.fontManager. drawText(this.gameCanvas, 390, text, 310, 230, 'starmap', 'white', true);
             }
         }
 
@@ -327,14 +327,14 @@ class beAdventurousEngine {
                 this.fontManager.drawText(
                     this.gameCanvas, 380, questionName,
                     this.gameWidth / 2 - questionBG.width / 2 + 60, this.gameHeight / 2 - questionBG.height / 2 + 30,
-                    'starmap', 'white'
+                    'starmap', 'white', true
                 );
 
                 const questionText = this.gameVariables.currentInteractable.question.text;
                 const textHeight = this.fontManager.drawText(
                     this.gameCanvas, 380, questionText,
                     this.gameWidth / 2 - questionBG.width / 2 + 60, this.gameHeight / 2 - questionBG.height / 2 + 80,
-                    'starmap', 'white'
+                    'starmap', 'white', true
                 );
 
                 const answers = this.gameVariables.currentInteractable.question.answers;
@@ -347,14 +347,14 @@ class beAdventurousEngine {
                         this.gameCanvas, 380, `${i+1})`,
                         this.gameWidth / 2 - questionBG.width / 2 + 60,
                         this.gameHeight / 2 - questionBG.height / 2 + 90 + textHeight + i * 10 + answerOffset,
-                        'starmap', '#23c6e7'
+                        'starmap', '#23c6e7', true
                     )
 
                     const heightOfBbox = this.fontManager.drawText(
                         this.gameCanvas, 380, text,
                         this.gameWidth / 2 - questionBG.width / 2 + 80,
                         this.gameHeight / 2 - questionBG.height / 2 + 90 + textHeight + i * 10 + answerOffset,
-                        'starmap', 'white'
+                        'starmap', 'white', true
                     );
 
                     if(questionData.boundingBoxes.length < answers.length) {
@@ -421,7 +421,7 @@ class beAdventurousEngine {
                     ctx.drawImage(tooltip.graphics, this.gameWidth / 2 - tooltip.width / 2, this.gameHeight / 2 - tooltip.height / 2 + tooltipOffsetY - 30);
                     const tooltipTextX = this.gameWidth / 2 - tooltip.width / 2 + 50;
                     const tooltipTextY = this.gameHeight / 2 - tooltip.height / 2;
-                    this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white');
+                    this.fontManager.drawText(this.gameCanvas, 218, this.gameVariables.inventoryTooltip.tooltip, tooltipTextX, tooltipTextY + tooltipOffsetY, 'starmap', 'white', true);
                 }
             }
 
@@ -441,7 +441,7 @@ class beAdventurousEngine {
                 const location = this.spriteManager.getSprite('Location');
                 const locationText = this.gameVariables.mapName;
                 ctx.drawImage(location.graphics, 20, 10);
-                this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white');
+                this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white', true);
                 this.gameVariables.mapNameOpacity = 1;
             } else {
                 if(this.gameVariables.mapNameOpacity > 0) {
@@ -452,7 +452,7 @@ class beAdventurousEngine {
 
                     ctx.globalAlpha = this.gameVariables.mapNameOpacity;
                     ctx.drawImage(location.graphics, 20, 10);
-                    this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white');
+                    this.fontManager.drawText(this.gameCanvas, 380, locationText, 53, 37, 'starmap', 'white', true);
                     ctx.globalAlpha = 1;
                 }
             }
