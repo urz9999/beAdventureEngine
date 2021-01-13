@@ -92,7 +92,6 @@ class FontManager {
             const style = styleCodeToStyle[fontCodeStyle];
             if(Number(fontCodeStyle) >= 0) {
                 ctx.fillStyle = style;
-                ctx.strokeStyle = style;
             } else {
                 ctx.font = style + ' ' + size + 'px' + ' ' + fontName;
             }

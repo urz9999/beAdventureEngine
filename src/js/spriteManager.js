@@ -75,7 +75,7 @@ class SpriteManager {
         const http = new XMLHttpRequest();
         http.open('HEAD', url, false);
         http.send();
-        return http.status != 404;
+        return http.status !== 404 && http.status !== 403;
     }
 }
 
