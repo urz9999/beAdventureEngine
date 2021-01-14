@@ -11,6 +11,11 @@ will also work on online documentation soon.
 
 The engine as also a demo project inside.
 
+# Documentation
+For the current stable release I've managed tu put 93% of documentation in this **[.pdf file](https://github.com/urz9999/beAdventureEngine/blob/main/beAdventurous%20Engine%201.0.pdf)**. 
+
+Still missing explanation of some classes but I'll be over them soon. All the configuration, minigame, tutorial and demo sections are completed and usable.
+
 # About the assets
 To make a simple demo project and to speedup development I used many graphical resources I found on the Internet.
 I'll try to give proper credit here for every resource I'm able to. 
