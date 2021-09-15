@@ -24,6 +24,20 @@ class SpriteManager {
         }
     }
 
+    readPartnerCharacter(id, name, walkingFrames, idleFrames, talkingFrames, width, height) {
+        this.readSprite(name, `/assets/images/ui/pgs/${id}.png`,{
+            type: 'partner',
+            sWidth: width,
+            sHeight: height,
+            walkingFrames: walkingFrames,
+            idleFrames: idleFrames,
+            talkingFrames: talkingFrames
+        });
+        if(this.imageExists(`/assets/images/ui/pgs/${id}Face.png`)) {
+            this.readSprite(`${name}Face`, `/assets/images/ui/pgs/${id}Face.png`);
+        }
+    }
+
     readAnimatedCharacter(name, path, sWidth, frames) {
         this.readSprite(name, path, {
             type: 'animated',
@@ -43,12 +57,12 @@ class SpriteManager {
                 const sprite = new Sprite(0,0, image.width, image.height, image);
                 this.spriteList[name] = { ready: true, sprite: sprite };
             } else {
-                if(opts.type === 'main') {
+                if(opts.type === 'main' || opts.type === 'partner') {
                     const sprite = new MainSprite(0,0, image.width, image.height, image, opts.sWidth, opts.sHeight, opts.walkingFrames, opts.idleFrames, opts.talkingFrames);
-                    this.spriteList[name] = { ready: true, sprite: sprite };
+                    this.spriteList[name] = { ready: true, sprite: sprite, type: opts.type };
                 } else {
                     const sprite = new AnimatedSprite(0, 0, image.width, image.height, image, opts.sWidth, image.height, opts.frames);
-                    this.spriteList[name] = { ready: true, sprite: sprite };
+                    this.spriteList[name] = { ready: true, sprite: sprite, type: 'generic' };
                 }
             }
         };

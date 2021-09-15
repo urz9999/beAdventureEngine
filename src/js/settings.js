@@ -17,6 +17,20 @@ class Settings {
 
     strokeColor;
 
+    rainColor;
+    dropCount;
+    windVelocity;
+    dropWidth;
+    dropXBuffer;
+    dropMinVelocity;
+    dropMaxVelocity;
+    dropMinLength;
+    dropMaxLength;
+    dropMinAlpha;
+    dropMaxAlpha;
+
+    partners = [];
+
     constructor() {
         this.fps = 30;
         this.gameTick = 6000;
@@ -35,6 +49,24 @@ class Settings {
         this.color8 = '#56478c';
         this.color9 = '#8d8d8d';
 
-        this.strokeColor = '#353728'
+        this.strokeColor = '#353728';
+
+        // Drop settings
+        this.rainColor = '#eff5f6';
+        this.dropCount = 100;
+        this.windVelocity = -0.1; // Determines how slanted the rain drops fall, 0 = straight down
+        this.dropWidth = 0.5; // Increase for thicker rain
+        this.dropXBuffer = 50; // How far to the sides of the screen drops will spawn
+        this.dropMinVelocity = 0.3;
+        this.dropMaxVelocity = 0.5;
+        this.dropMinLength = 15;
+        this.dropMaxLength = 30;
+        this.dropMinAlpha = 0.3;
+        this.dropMaxAlpha = 0.6;
+
+        // Partners configuration
+        this.partners = [
+            { id: 'dog', name: 'mechadog', offsetX: -80, offsetY: 50, size: 0.5, activateDialog: 'Warf, bau bau!', okDialog: 'Wof! Wof!', cancelDialog: 'Cai! Cai! Booo...', walkingFrames: 5, idleFrames: 5, talkingFrames: 0, width: 55, height: 41 }
+        ];
     }
 }

@@ -280,6 +280,16 @@ class InteractableManager {
         this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] =
             (trigger === 'toggle' ? setOpposite(this.gameVariables.triggers[this.gameVariables.currentInteractable.linked]) : trigger);
 
+        // Apply weather effect is present
+        if(this.gameVariables.currentInteractable.effect !== undefined) {
+            const effect = this.gameVariables.currentInteractable.effect;
+            if(this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] === 1) {
+                this.gameVariables.mapsEffects[effect.map] = effect.name;
+            } else {
+                delete this.gameVariables.mapsEffects[effect.map];
+            }
+        }
+
         // Play sound if exists
         if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
             this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
@@ -365,6 +375,12 @@ class InteractableManager {
             if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
                 this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
             }
+
+            // Apply weather effect is present
+            if(this.gameVariables.currentInteractable.effect !== undefined) {
+                const effect = this.gameVariables.currentInteractable.effect;
+                this.gameVariables.mapsEffects[effect.map] = effect.name;
+            }
         }
     }
 
@@ -378,6 +394,7 @@ class InteractableManager {
             const object = results[i].object;
             const wingame = results[i].wingame;
             const sound = results[i].sound;
+            const effect = results[i].effect;
 
             if(trigger !== undefined) {
                 this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
@@ -396,6 +413,9 @@ class InteractableManager {
                 // Play sound if exists
                 this.soundSystem.playSound(sound);
                 results[i].soundPlayed = true;
+            }
+            if(effect !== undefined) {
+                this.gameVariables.mapsEffects[effect.map] = effect.name;
             }
         }
     }

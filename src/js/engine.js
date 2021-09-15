@@ -11,6 +11,8 @@ class beAdventurousEngine {
     mapManager;
     mouseManager;
     interactableManager;
+    mathHelper;
+    effectManager;
 
     gameStatus;
     gameVariables;
@@ -51,7 +53,9 @@ class beAdventurousEngine {
             cursor: 'standard',
             scale: 1,
             originalWidth: 0,
-            originalHeight: 0
+            originalHeight: 0,
+
+            partnerIndex: 0
         };
 
         this.gameVariables = {
@@ -72,10 +76,13 @@ class beAdventurousEngine {
             currentDialog: null,
             inventoryTooltip: null,
             selectedMinigame: null,
+            mapsEffects: {}
         };
 
         // Settings first
         this.settings = new Settings();
+        // math helper
+        this.mathHelper = new MathHelper();
 
         // ==== Start fixing Dpi from here and then in game-loop
         this.gameStatus.originalWidth = +getComputedStyle(this.gameCanvas).getPropertyValue("width").slice(0, -2);
@@ -86,9 +93,10 @@ class beAdventurousEngine {
         this.soundSystem = new SoundSystem();
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables, this.settings);
-        this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem);
+        this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem, this.settings);
         this.interactableManager = new InteractableManager(this.soundSystem, this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
-        this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas, this.gameWidth, this.gameHeight);
+        this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas, this.gameWidth, this.gameHeight, this.settings);
+        this.effectManager = new EffectManager(this.gameCanvas, this.gameStatus, this.gameVariables, this.mathHelper, this.settings);
     }
 
     start(number) {
@@ -141,7 +149,7 @@ class beAdventurousEngine {
         // ==== Drawing operation here... ===================
         switch (this.gameStatus.levelStatus) {
             case 0: this.drawLoader(); break;
-            case 1: this.drawMap(); break;
+            case 1: this.drawMap(tick); break;
             case 2: this.gameVariables.selectedMinigame.draw(time);
         }
     }
@@ -195,7 +203,7 @@ class beAdventurousEngine {
         }
     }
 
-    drawMap() {
+    drawMap(dt) {
         // Basic buffer
         const ctx = this.gameCanvas.getContext('2d');
 
@@ -204,8 +212,8 @@ class beAdventurousEngine {
 
         // Apply special translation here if needed
         if(!this.gameVariables.player.noplayer && this.gameVariables.isMapBiggerThanCanvas) {
-            const player = this.spriteManager.getSprite('main');
-            let cam = player.subSprite.dx + player.subSprite.width / 2 - this.gameWidth / 2;
+            const currentPlayer = this.gameStatus.partnerIndex === 0 ? this.spriteManager.getSprite('main') : this.spriteManager.getSprite(this.settings.partners[this.gameStatus.partnerIndex - 1].name);
+            let cam = currentPlayer.subSprite.dx + currentPlayer.subSprite.width / 2 - this.gameWidth / 2;
 
             // check deadzones
             if(cam <= 0) cam = 0;
@@ -258,7 +266,7 @@ class beAdventurousEngine {
             }
         }
 
-        // Player
+        // Player & partners
         if (this.gameVariables.player.noplayer === false) {
             const player = this.spriteManager.getSprite('main');
             ctx.drawImage(
@@ -266,6 +274,19 @@ class beAdventurousEngine {
                 player.subSprite.sx, player.subSprite.sy, player.subSprite.width, player.subSprite.height,
                 player.subSprite.dx, player.subSprite.dy, player.subSprite.width, player.subSprite.height
             );
+
+            // Load partners
+            if(this.settings.partners.length > 0) {
+                for(let i = 0; i < this.settings.partners.length; i++) {
+                    const partner = this.settings.partners[i];
+                    const partnerSprite = this.spriteManager.getSprite(partner.name);
+                    ctx.drawImage(
+                        partnerSprite.graphics,
+                        partnerSprite.subSprite.sx, partnerSprite.subSprite.sy, partnerSprite.subSprite.width, partnerSprite.subSprite.height,
+                        partnerSprite.subSprite.dx, partnerSprite.subSprite.dy, partnerSprite.subSprite.width, partnerSprite.subSprite.height
+                    );
+                }
+            }
         }
 
         // If debug is active show interactable bounding boxes
@@ -289,6 +310,9 @@ class beAdventurousEngine {
 
         // Before painting UI restore the context
         ctx.restore();
+
+        // Effects
+        this.effectManager.drawEffect(dt);
 
         // Ui - Dialog Box
         if(this.gameVariables.currentDialog !== null) {
@@ -425,6 +449,20 @@ class beAdventurousEngine {
                 }
             }
 
+            // Ui - Partner Change
+            if(this.settings.partners.length > 0) {
+                const swapPartnersIcon = this.spriteManager.getSprite('PartnerChange');
+
+                const faces = [];
+                faces.push(this.spriteManager.getSprite('mainFace'));
+                for(let i = 0; i < this.settings.partners.length; i++) {
+                    faces.push(this.spriteManager.getSprite(this.settings.partners[i].name + 'Face'));
+                }
+
+                ctx.drawImage(swapPartnersIcon.graphics, 40, 20, 103, 63);
+                ctx.drawImage(faces[this.gameStatus.partnerIndex].graphics, 74, 33, 35, 35);
+            }
+
             // Ui - Pause Button
             const playIcon = this.spriteManager.getSprite('PlayIcon');
             const pauseIcon = this.spriteManager.getSprite('PauseIcon');
@@ -448,7 +486,7 @@ class beAdventurousEngine {
                     const location = this.spriteManager.getSprite('Location');
                     const locationText = this.gameVariables.mapName;
 
-                    this.gameVariables.mapNameOpacity = this.lerp(this.gameVariables.mapNameOpacity, 0, 0.3);
+                    this.gameVariables.mapNameOpacity = this.mathHelper.lerp(this.gameVariables.mapNameOpacity, 0, 0.3);
 
                     ctx.globalAlpha = this.gameVariables.mapNameOpacity;
                     ctx.drawImage(location.graphics, 20, 10);
@@ -482,28 +520,70 @@ class beAdventurousEngine {
             char.animate();
         }
 
-        // Player animations
+        // Player & partners animations
         const speed = 10;
+
         const player = this.spriteManager.getSprite('main');
         const direction = this.gameVariables.player.direction;
         const animation = this.gameVariables.player.animation;
 
         switch (animation) {
-            case 'idle': !direction ? player.playLeftIdle() : player.playRightIdle(); break;
-            case 'walking': !direction ? player.playLeftWalking() : player.playRightWalking(); break;
-            case 'talking': !direction ? player.playleftTalking() : player.playRightTalking(); break;
+            case 'idle': {
+                if(!direction) {
+                    player.playLeftIdle();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playLeftIdle(); }
+                } else {
+                    player.playRightIdle();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playRightIdle(); }
+                }
+                break;
+            }
+            case 'walking': {
+                if(!direction) {
+                    player.playLeftWalking();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playLeftWalking(); }
+                } else {
+                    player.playRightWalking();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playRightWalking(); }
+                }
+                break;
+            }
+            case 'talking': {
+                if(!direction) {
+                    player.playleftTalking();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playleftTalking(); }
+                } else {
+                    player.playRightTalking();
+                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playRightWalking(); }
+                }
+                break;
+            }
         }
 
         if(animation === 'walking' || this.gameStatus.correctingView) {
             // process movement
-            const x = player.getCoords().x;
+            const x = this.gameStatus.partnerIndex === 0 ? player.getCoords().x : this.spriteManager.getSprite(this.settings.partners[this.gameStatus.partnerIndex - 1].name).getCoords().x;
 
             if( (direction === false && x >= this.gameVariables.player.reachX) || (direction === true  && x < (this.gameVariables.player.reachX)) ) {
                 // Move player
                 let shift = (direction ? speed : -speed);
+                let partnerShift = (direction ? 1 : -1);
 
                 this.gameVariables.player.reachX = this.gameVariables.player.reachX - shift;
-                player.setCoords(this.lerp(player.getCoords().x + shift, this.gameVariables.player.reachX, 0.1), player.getCoords().y);
+
+                if(this.gameStatus.partnerIndex === 0) {
+                    // If different from 0 the main character stay in place
+                    player.setCoords(this.mathHelper.lerp(player.getCoords().x + shift, this.gameVariables.player.reachX, 0.1), player.getCoords().y);
+                }
+
+                // Move Partners
+                for(let i = 0; i < this.settings.partners.length; i++) {
+                    const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                    const partnerData = this.settings.partners.find(partner => partner.name === this.settings.partners[i].name);
+                    const partnerOffset = this.gameStatus.partnerIndex !== (i+1) ? partnerData.offsetX * partnerShift : 0;
+
+                    partner.setCoords(this.mathHelper.lerp(partner.getCoords().x + shift, this.gameVariables.player.reachX + partnerOffset, 0.1), partner.getCoords().y);
+                }
 
                 // Set cursor as move
                 this.gameStatus.cursor = 'move';
@@ -521,7 +601,4 @@ class beAdventurousEngine {
         }
     }
 
-    lerp (start, end, amt){
-        return (1 - amt) * start + amt * end;
-    }
 }

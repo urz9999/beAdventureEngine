@@ -9,7 +9,9 @@ class MouseManager {
     spriteManager;
     interactableManager;
 
-    constructor(spriteManager, interactableManager, gameStatus, gameVariables, gameCanvas, gameWidth, gameHeight) {
+    settings;
+
+    constructor(spriteManager, interactableManager, gameStatus, gameVariables, gameCanvas, gameWidth, gameHeight, settings) {
         this.spriteManager = spriteManager;
         this.interactableManager = interactableManager;
         this.gameStatus = gameStatus;
@@ -17,6 +19,7 @@ class MouseManager {
         this.gameCanvas = gameCanvas;
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
+        this.settings = settings;
     }
 
     processMouse(event) {
@@ -84,7 +87,10 @@ class MouseManager {
     }
 
     processClicks(event) {
-        const playerSprite = this.spriteManager.getSprite('main').subSprite;
+        let playerSprite = this.spriteManager.getSprite('main').subSprite;
+        if(this.gameStatus.partnerIndex !== 0) {
+            playerSprite = this.spriteManager.getSprite(this.settings.partners[this.gameStatus.partnerIndex - 1].name).subSprite;
+        }
         const rect = this.gameCanvas.getBoundingClientRect();
         const canvasX = (event.clientX - rect.left) / this.gameStatus.scale;
         const canvasY = (event.clientY - rect.top) / this.gameStatus.scale;
@@ -115,6 +121,14 @@ class MouseManager {
         // Pause - Always process menu icons first
         if((this.overMenuIcon(canvasX, canvasY, 'PauseIcon') || this.overMenuIcon(canvasX, canvasY, 'PlayIcon')) && this.gameVariables.player.noplayer === false) {
             this.gameStatus.gamePaused = !this.gameStatus.gamePaused;
+            return;
+        }
+
+        if(this.overMenuIcon(canvasX, canvasY, 'PartnerChange')) {
+            this.gameStatus.partnerIndex++;
+            if(this.gameStatus.partnerIndex > this.settings.partners.length) {
+                this.gameStatus.partnerIndex = 0;
+            }
             return;
         }
 

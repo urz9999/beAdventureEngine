@@ -9,8 +9,9 @@ class MapManager {
 
     spriteManager;
     soundSystem;
+    settings;
 
-    constructor(gamewidth, gameHeight, gameStatus, gameVariables, spriteManager, soundSystem) {
+    constructor(gamewidth, gameHeight, gameStatus, gameVariables, spriteManager, soundSystem, settings) {
         this.map = {};
 
         this.gameWidth = gamewidth;
@@ -20,6 +21,8 @@ class MapManager {
 
         this.spriteManager = spriteManager;
         this.soundSystem = soundSystem;
+
+        this.settings = settings;
     }
 
     async loadMap(name) {
@@ -52,6 +55,7 @@ class MapManager {
         this.spriteManager.readSprite('PauseIcon', `assets/images/ui/menu/pause.png`);
         this.spriteManager.readSprite('InventoryIcon', `assets/images/ui/menu/inventory.png`);
         this.spriteManager.readSprite('InventorySlot', `assets/images/ui/menu/inventorySlot.png`);
+        this.spriteManager.readSprite('PartnerChange', `assets/images/ui/menu/partnerChange.png`);
         this.spriteManager.readSprite('DialogBox', `assets/images/ui/menu/dialog.png`);
         this.spriteManager.readSprite('Tooltip', `assets/images/ui/menu/tooltip.png`);
         this.spriteManager.readSprite('Question', `assets/images/ui/menu/question.png`);
@@ -59,6 +63,13 @@ class MapManager {
 
         // Load main character
         this.spriteManager.readMainCharacter();
+        // Load partners
+        if(this.settings.partners.length > 0) {
+            for(let i = 0; i < this.settings.partners.length; i++) {
+                const partner = this.settings.partners[i];
+                this.spriteManager.readPartnerCharacter(partner.id, partner.name, partner.walkingFrames, partner.idleFrames, partner.talkingFrames, partner.width, partner.height);
+            }
+        }
 
         // Load other characters
         for(let i = 0; i < map.characters.length; i++) {
@@ -102,6 +113,11 @@ class MapManager {
         this.gameVariables.staticTexts = map.staticTexts;
         this.gameVariables.player = { direction: true, animation: 'idle', noplayer:  map.noplayer || false, initialOffsetX: 0, cam: 0 }
 
+        // Load initial effect
+        if(this.map.effect !== undefined) {
+            this.gameVariables.mapsEffects[number] = this.map.effect;
+        }
+
         // Load all textures
         const waiter = setInterval(() => {
             if(this.spriteManager.allSpriteLoaded()) {
@@ -122,6 +138,11 @@ class MapManager {
                 this.gameVariables.player.initialOffsetX = initialOffsetX;
 
                 this.spriteManager.getSprite('main').setCoords(startingLocation[0], startingLocation[1]);
+
+                for(let i = 0; i < this.settings.partners.length; i++) {
+                    const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                    partner.setCoords(startingLocation[0] + this.settings.partners[i].offsetX, startingLocation[1] + this.settings.partners[i].offsetY);
+                }
 
                 // Set character position
                 for(let i = 0; i < this.gameVariables.characters.length; i++) {
