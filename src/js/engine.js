@@ -94,7 +94,7 @@ class beAdventurousEngine {
         this.spriteManager = new SpriteManager();
         this.fontManager = new FontManager(this.gameVariables, this.settings);
         this.mapManager = new MapManager(this.gameWidth, this.gameHeight, this.gameStatus, this.gameVariables, this.spriteManager, this.soundSystem, this.settings);
-        this.interactableManager = new InteractableManager(this.soundSystem, this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas);
+        this.interactableManager = new InteractableManager(this.soundSystem, this.spriteManager, this.mapManager, this.gameStatus, this.gameVariables, this.gameCanvas, this.settings);
         this.mouseManager = new MouseManager(this.spriteManager, this.interactableManager, this.gameStatus, this.gameVariables, this.gameCanvas, this.gameWidth, this.gameHeight, this.settings);
         this.effectManager = new EffectManager(this.gameCanvas, this.gameStatus, this.gameVariables, this.mathHelper, this.settings);
     }
@@ -463,6 +463,13 @@ class beAdventurousEngine {
                 ctx.drawImage(faces[this.gameStatus.partnerIndex].graphics, 74, 33, 35, 35);
             }
 
+            // Ui - Point System
+            if (this.settings.usePointSystem) {
+                const points = this.spriteManager.getSprite('Points');
+                ctx.drawImage(points.graphics, this.gameWidth / 2 - points.width / 2 - 130, 20);
+                this.fontManager.drawText(this.gameCanvas, 300, this.settings.points.toString(), this.gameWidth / 2 - 80 - points.width / 2, 50, 'starmap', 'white', true);
+            }
+
             // Ui - Pause Button
             const playIcon = this.spriteManager.getSprite('PlayIcon');
             const pauseIcon = this.spriteManager.getSprite('PauseIcon');
@@ -531,20 +538,32 @@ class beAdventurousEngine {
             case 'idle': {
                 if(!direction) {
                     player.playLeftIdle();
-                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playLeftIdle(); }
+                    for(let i = 0; i < this.settings.partners.length; i++) {
+                        const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                        this.gameStatus.partnerIndex === 0 && player.getCoords().x > partner.getCoords().x ? partner.playRightIdle() : partner.playLeftIdle();
+                    }
                 } else {
                     player.playRightIdle();
-                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playRightIdle(); }
+                    for(let i = 0; i < this.settings.partners.length; i++) {
+                        const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                        this.gameStatus.partnerIndex === 0 && player.getCoords().x < partner.getCoords().x ? partner.playLeftIdle() : partner.playRightIdle();
+                    }
                 }
                 break;
             }
             case 'walking': {
                 if(!direction) {
                     player.playLeftWalking();
-                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playLeftWalking(); }
+                    for(let i = 0; i < this.settings.partners.length; i++) {
+                        const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                        this.gameStatus.partnerIndex === 0 && player.getCoords().x > partner.getCoords().x ? partner.playRightWalking() : partner.playLeftWalking();
+                    }
                 } else {
                     player.playRightWalking();
-                    for(let i = 0; i < this.settings.partners.length; i++) { const partner = this.spriteManager.getSprite(this.settings.partners[i].name); partner.playRightWalking(); }
+                    for(let i = 0; i < this.settings.partners.length; i++) {
+                        const partner = this.spriteManager.getSprite(this.settings.partners[i].name);
+                        this.gameStatus.partnerIndex === 0 && player.getCoords().x < partner.getCoords().x ? partner.playLeftWalking() : partner.playRightWalking();
+                    }
                 }
                 break;
             }

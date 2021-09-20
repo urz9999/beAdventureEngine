@@ -120,7 +120,8 @@
         "result": [
           { "trigger": 1 },
           { "object": { "name": "money", "description": "un pacco di soldi fruscianti per te!" } },
-          { "sound":  "ding.wav" }
+          { "sound":  "ding.wav" },
+          { "point":  20 }
         ]
       },
       "messages": [
@@ -187,6 +188,69 @@
       ]
     },
     {
+      "type": "partner",
+      "partner": "Mecha Dog",
+      "linked": "sewer",
+      "x": 950,
+      "y": 440,
+      "width": 50,
+      "height": 49,
+      "result": [
+        { "object": { "name": "keyring", "description": "Indispensabile portachiavi di pelle di pavone made in Cinesello Balsamo!" } },
+        { "trigger": 1 },
+        { "sound":  "pickup.wav" },
+        { "point":  10 }
+      ],
+      "doneMessages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Abbiamo già trovato quello che ci serviva!"
+        }
+      ],
+      "completedMessages": [
+        {
+          "type": "other",
+          "text": "Wof! Wof! Abbabboo (Cit.)!",
+          "portrait": "Mecha Dog",
+          "name": "Mecha Dog"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ottimo lavoro! Questo mistico portachiavi in pelle di pavone maculato di Cinesello Balsamo ci sarà fondamentale!"
+        }
+      ],
+      "notMetMessages": [
+        {
+          "type": "other",
+          "name": "Mecha Dog",
+          "portrait": "Mecha Dog",
+          "text": "Woff! Bau bau! Warf! Awwawoooo!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Che succede hai trovato qualcosa?"
+        },
+        {
+          "type": "other",
+          "name": "Mecha Dog",
+          "portrait": "Mecha Dog",
+          "text": "Arf! Barf! Baboo! (annuisce e scodinzola)"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ok ok! Ti do il cambio agisci mio fedele assistente Mecha Dog!"
+        }
+      ]
+    },
+    {
       "type": "object",
       "description": "una pozione misteriosa trovata sul terreno",
       "linked": "potion",
@@ -224,6 +288,9 @@
           "portrait": "main",
           "text": "Uhm, forse qua in giro c'è Brandon Lee! Un mistero eh! Un abbraccio...Adam!"
         }
+      ],
+      "result": [
+        { "point":  15 }
       ]
     },
     {
@@ -341,6 +408,11 @@
       "name": "door",
       "x": 737,
       "y": 339
+    },
+    {
+      "name": "sewer",
+      "x": 950,
+      "y": 440
     }
   ],
   "staticTexts": [],

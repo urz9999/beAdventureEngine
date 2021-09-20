@@ -9,7 +9,9 @@ class InteractableManager {
 
     processTriggerSemaphore;
 
-    constructor(soundSystem, spriteManager, mapManager, gameStatus, gameVariables, gameCanvas) {
+    settings;
+
+    constructor(soundSystem, spriteManager, mapManager, gameStatus, gameVariables, gameCanvas, settings) {
         this.soundSystem = soundSystem;
         this.spriteManager = spriteManager;
         this.mapManager = mapManager;
@@ -19,27 +21,42 @@ class InteractableManager {
         this.gameCanvas = gameCanvas;
 
         this.processTriggerSemaphore = false;
+
+        this.settings = settings;
     }
 
     processInteractables() {
         if(this.gameVariables.currentInteractable !== null && !this.gameStatus.walkingToInteractable) {
             // Here we have an interactable close enough to process it!
-            switch (this.gameVariables.currentInteractable.type) {
-                case 'dialog': this.processDialog(this.gameVariables.currentInteractable.messages); break;
-                case 'look': this.processDialog(this.gameVariables.currentInteractable.messages); break;
-                case 'object': this.addToInventory(); this.processDialog(this.gameVariables.currentInteractable.messages); break;
-                case 'interact': this.processTriggerAndDialog(); break;
-                case 'question': this.processQuestionDialog(); break;
-                case 'combine': this.processCombine(); break;
-                case 'minigame': this.processMinigame(); break;
-                case 'openurl': this.processOpenUrl(); break;
-                case 'teleport': this.processTeleport(); break;
-                case 'exit': this.processTeleport(); break;
+            // Update: added partner system so we check if we are currently in partner mode or not for every event
+            if(
+               this.gameStatus.partnerIndex === 0 ||
+               (
+                   this.gameVariables.currentInteractable.partner !== undefined &&
+                   this.gameVariables.currentInteractable.partner === this.settings.partners[this.gameStatus.partnerIndex - 1].name
+               )
+            ) {
+                switch (this.gameVariables.currentInteractable.type) {
+                    case 'dialog': this.processDialog(this.gameVariables.currentInteractable.messages); break;
+                    case 'look': this.processLook(); break;
+                    case 'object': this.addToInventory(); this.processDialog(this.gameVariables.currentInteractable.messages); break;
+                    case 'interact': this.processTriggerAndDialog(); break;
+                    case 'question': this.processQuestionDialog(); break;
+                    case 'combine': this.processCombine(); break;
+                    case 'minigame': this.processMinigame(); break;
+                    case 'openurl': this.processOpenUrl(); break;
+                    case 'teleport': this.processTeleport(); break;
+                    case 'partner': this.processPartnerAndDiaog(); break;
+                    case 'exit': this.processTeleport(); break;
+                }
+            } else {
+                this.processDeniedPartner();
             }
         }
     }
 
     processClicksForEvents() {
+        console.log('click', this.gameVariables.currentInteractable);
         if(this.gameVariables.currentInteractable !== null && !this.gameStatus.walkingToInteractable) {
             // Here we have an interactable close enough to process it!
             switch (this.gameVariables.currentInteractable.type) {
@@ -53,6 +70,60 @@ class InteractableManager {
                 case 'openurl': break;
                 case 'teleport': break;
                 case 'exit': this.incrementMessageIndex(); break;
+                default: this.incrementMessageIndex(); break;
+            }
+        }
+    }
+
+    processDeniedPartner() {
+        if(!this.gameVariables.currentInteractable.messageIndex || this.gameVariables.currentInteractable.messageIndex === 0) {
+            const partner = this.settings.partners[this.gameStatus.partnerIndex - 1];
+
+            this.gameVariables.currentInteractable = {
+                type: "dialog",
+                linked: partner.id,
+                width: this.gameVariables.currentInteractable.width,
+                height: this.gameVariables.currentInteractable.height,
+                x: this.gameVariables.currentInteractable.x,
+                y: this.gameVariables.currentInteractable.y,
+                messages: [
+                    {
+                        type: "other",
+                        name: partner.name,
+                        portrait: partner.name,
+                        text: partner.cancelDialog
+                    }
+                ]
+            };
+        }
+        this.processDialog(this.gameVariables.currentInteractable.messages);
+    }
+
+    processPartnerAndDiaog() {
+        if (this.gameStatus.partnerIndex !== 0) {
+            if(!this.gameVariables.triggers[this.gameVariables.currentInteractable.linked]) {
+                this.processDialog(this.gameVariables.currentInteractable.completedMessages, () => {
+                    this.processResultPrize(this.gameVariables.currentInteractable.result);
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
+            } else {
+                this.processDialog(this.gameVariables.currentInteractable.doneMessages, () => {
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
+            }
+        } else {
+            if(!this.gameVariables.triggers[this.gameVariables.currentInteractable.linked]) {
+                this.processDialog(this.gameVariables.currentInteractable.notMetMessages, () => {
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
+            } else {
+                this.processDialog(this.gameVariables.currentInteractable.doneMessages, () => {
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
             }
         }
     }
@@ -303,7 +374,11 @@ class InteractableManager {
             // finish: remove interactable only if not question or question is at the end, in that case we handle it safely from its processor callback
             this.gameVariables.currentInteractable.messageIndex = 0;
 
-            if(this.gameVariables.currentInteractable.type !== 'question') {
+            if(
+                this.gameVariables.currentInteractable.type !== 'question' &&
+                this.gameVariables.currentInteractable.type !== 'partner' &&
+                this.gameVariables.currentInteractable.type !== 'look'
+            ) {
                 this.gameVariables.currentInteractable = null;
                 this.gameStatus.processInteractable = false;
             }
@@ -395,6 +470,7 @@ class InteractableManager {
             const wingame = results[i].wingame;
             const sound = results[i].sound;
             const effect = results[i].effect;
+            const point = results[i].point;
 
             if(trigger !== undefined) {
                 this.gameVariables.triggers[this.gameVariables.currentInteractable.linked] = 1;
@@ -417,6 +493,9 @@ class InteractableManager {
             if(effect !== undefined) {
                 this.gameVariables.mapsEffects[effect.map] = effect.name;
             }
+            if(point !== undefined) {
+                this.settings.points += point;
+            }
         }
     }
 
@@ -428,5 +507,15 @@ class InteractableManager {
             // go to credit map
             this.executeTeleport({ number: creditMap, spawn: [0,0]});
         }
+    }
+
+    processLook() {
+        this.processDialog(this.gameVariables.currentInteractable.messages, () => {
+            if(this.processResultPrize(this.gameVariables.currentInteractable.result)) {
+                this.processResultPrize(this.gameVariables.currentInteractable.result);
+            }
+            this.gameVariables.currentInteractable = null;
+            this.gameStatus.processInteractable = false;
+        });
     }
 }

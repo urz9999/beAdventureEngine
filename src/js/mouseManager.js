@@ -58,6 +58,7 @@ class MouseManager {
                     case 'question': this.gameStatus.cursor = 'talk'; break;
                     case 'look': this.gameStatus.cursor = 'look'; break;
                     case 'combine': this.gameStatus.cursor = 'combine'; break;
+                    case 'partner': this.gameStatus.cursor = 'combine'; break;
                     case 'minigame': this.gameStatus.cursor = 'combine'; break;
                     case 'openurl': this.gameStatus.cursor = 'standard'; break;
                     case 'teleport': this.gameStatus.cursor = 'standard'; break;
@@ -245,7 +246,7 @@ class MouseManager {
         for(let i = 0; i < this.gameVariables.interactables.length; i++) {
             const interactable = Object.assign({}, this.gameVariables.interactables[i]);
 
-            // Correct by player cam if needed as this only servers when the player is active
+            // Correct by player cam if needed as this only serves when the player is active
             // Also this serves only here because the other element on the UI are 0-translated again
             const translatedX = this.gameVariables.player.noplayer ? canvasX : canvasX + this.gameVariables.player.cam;
 

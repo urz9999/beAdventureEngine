@@ -84,13 +84,15 @@
       "height": 100,
       "conditions": [
         { "object": { "name" : "potion", "value": 1 } },
+        { "object": { "name": "keyring", "value": 1 } },
         { "trigger": { "name": "eri", "value": 1 } }
       ],
       "result": [
         { "trigger": 1 },
         { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco dato da Dorothy!" } },
         { "sound":  "pickup.wav" },
-        { "effect": { "map": 1, "name": "RAIN" } }
+        { "effect": { "map": 1, "name": "RAIN" } },
+        { "point":  15 }
       ],
       "notMetMessages": [
         {
@@ -116,6 +118,18 @@
           "name": "Madeline",
           "portrait": "main",
           "text": "Ok ok! Penso di sapere cosa fare!"
+        },
+        {
+          "type": "other",
+          "name": "Dorothy MK VII",
+          "portrait": "dorothy",
+          "text": "Voglio anche il portachiavi esclusivisssssimo!!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "..."
         }
       ],
       "completedMessages": [

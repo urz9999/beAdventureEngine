@@ -60,6 +60,7 @@ class MapManager {
         this.spriteManager.readSprite('Tooltip', `assets/images/ui/menu/tooltip.png`);
         this.spriteManager.readSprite('Question', `assets/images/ui/menu/question.png`);
         this.spriteManager.readSprite('Location', `assets/images/ui/menu/location.png`);
+        this.spriteManager.readSprite('Points', `assets/images/ui/menu/point.png`);
 
         // Load main character
         this.spriteManager.readMainCharacter();
@@ -101,6 +102,15 @@ class MapManager {
         const combines = map.interactables.filter(int => int.type === 'combine');
         for(let i = 0; i < combines.length; i++) {
             const objects = combines[i].result.filter(r => r.object !== undefined);
+            for(let j = 0; j < objects.length; j++) {
+                this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
+            }
+        }
+
+        // Load prize for partners
+        const partners = map.interactables.filter(int => int.type === 'partner');
+        for(let i = 0; i < partners.length; i++) {
+            const objects = partners[i].result.filter(r => r.object !== undefined);
             for(let j = 0; j < objects.length; j++) {
                 this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
             }

@@ -29,7 +29,12 @@ class Settings {
     dropMinAlpha;
     dropMaxAlpha;
 
+    // Partner System
     partners = [];
+
+    // Point System
+    points;
+    usePointSystem;
 
     constructor() {
         this.fps = 30;
@@ -66,7 +71,11 @@ class Settings {
 
         // Partners configuration
         this.partners = [
-            { id: 'dog', name: 'mechadog', offsetX: -80, offsetY: 50, size: 0.5, activateDialog: 'Warf, bau bau!', okDialog: 'Wof! Wof!', cancelDialog: 'Cai! Cai! Booo...', walkingFrames: 5, idleFrames: 5, talkingFrames: 0, width: 55, height: 41 }
+            { id: 'dog', name: 'Mecha Dog', offsetX: -80, offsetY: 50, size: 0.5, activateDialog: 'Warf, bau bau! (I\'m ready!)', okDialog: 'Wof! Wof! (Yes!)', cancelDialog: 'Cai! Cai! Booo! (can\'t make it!)', walkingFrames: 5, idleFrames: 5, talkingFrames: 0, width: 55, height: 41 }
         ];
+
+        // Configuration for point system
+        this.points = 0;
+        this.usePointSystem = true;
     }
 }
