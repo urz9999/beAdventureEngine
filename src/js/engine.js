@@ -81,6 +81,7 @@ class beAdventurousEngine {
 
         // Settings first
         this.settings = new Settings();
+
         // math helper
         this.mathHelper = new MathHelper();
 

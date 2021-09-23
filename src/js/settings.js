@@ -37,45 +37,53 @@ class Settings {
     usePointSystem;
 
     constructor() {
-        this.fps = 30;
-        this.gameTick = 6000;
-        this.creditMap = 99; // Set here what map to use for credit
+        this.loaded = false;
+        this.loadSettings();
 
-        this.debug = false;
-        this.fullscreen = true;
+    }
 
-        this.color1 = '#00faff';
-        this.color2 = '#d000ff';
-        this.color3 = '#bbff00';
-        this.color4 = '#ff0000';
-        this.color5 = '#000000';
-        this.color6 = '#f3ad55';
-        this.color7 = '#0022ff';
-        this.color8 = '#56478c';
-        this.color9 = '#8d8d8d';
+    async loadSettings() {
+        // Load data
+        const response = await fetch(`assets/settings.json`);
+        const settings = await response.json();
 
-        this.strokeColor = '#353728';
+        this.fps = settings.fps;
+        this.gameTick = settings.gameTick;
+        this.creditMap = settings.creditMap; // Set here what map to use for credit
+
+        this.debug = settings.debug;
+        this.fullscreen = settings.fullscreen;
+
+        this.color1 = settings.color1;
+        this.color2 = settings.color2;
+        this.color3 = settings.color3;
+        this.color4 = settings.color4;
+        this.color5 = settings.color5;
+        this.color6 = settings.color6;
+        this.color7 = settings.color7;
+        this.color8 = settings.color8;
+        this.color9 = settings.color9;
+
+        this.strokeColor = settings.strokeColor;
 
         // Drop settings
-        this.rainColor = '#eff5f6';
-        this.dropCount = 100;
-        this.windVelocity = -0.1; // Determines how slanted the rain drops fall, 0 = straight down
-        this.dropWidth = 0.5; // Increase for thicker rain
-        this.dropXBuffer = 50; // How far to the sides of the screen drops will spawn
-        this.dropMinVelocity = 0.3;
-        this.dropMaxVelocity = 0.5;
-        this.dropMinLength = 15;
-        this.dropMaxLength = 30;
-        this.dropMinAlpha = 0.3;
-        this.dropMaxAlpha = 0.6;
+        this.rainColor = settings.rainColor;
+        this.dropCount = settings.dropCount;
+        this.windVelocity = settings.windVelocity; // Determines how slanted the rain drops fall, 0 = straight down
+        this.dropWidth = settings.dropWidth; // Increase for thicker rain
+        this.dropXBuffer = settings.dropXBuffer; // How far to the sides of the screen drops will spawn
+        this.dropMinVelocity = settings.dropMinVelocity;
+        this.dropMaxVelocity = settings.dropMaxVelocity;
+        this.dropMinLength = settings.dropMinLength;
+        this.dropMaxLength = settings.dropMaxLength;
+        this.dropMinAlpha = settings.dropMinAlpha;
+        this.dropMaxAlpha = settings.dropMaxAlpha;
 
         // Partners configuration
-        this.partners = [
-            { id: 'dog', name: 'Mecha Dog', offsetX: -80, offsetY: 50, size: 0.5, activateDialog: 'Warf, bau bau! (I\'m ready!)', okDialog: 'Wof! Wof! (Yes!)', cancelDialog: 'Cai! Cai! Booo! (can\'t make it!)', walkingFrames: 5, idleFrames: 5, talkingFrames: 0, width: 55, height: 41 }
-        ];
+        this.partners = settings.partners
 
         // Configuration for point system
         this.points = 0;
-        this.usePointSystem = true;
+        this.usePointSystem = settings.usePointSystem;
     }
 }
