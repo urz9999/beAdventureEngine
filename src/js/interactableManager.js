@@ -167,20 +167,31 @@ class InteractableManager {
             }
             // If still undefined do nothing and continue the minigame
         }, () => {
-            this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+            this.processDialog(this.gameVariables.currentInteractable.notMetMessages, () => {
+				this.gameStatus.minigameWin = undefined;
+                this.gameVariables.selectedMinigame = null;
+			});
         });
     }
 
     processCombine() {
-        this.processConditions(() => {
-            // Add object and triggers
-            this.processResultPrize(this.gameVariables.currentInteractable.result);
+		if(this.gameVariables.currentInteractable.completed === undefined) {
+			this.processConditions(() => {
+				// Prevent other accesses to win condition
+				this.gameVariables.currentInteractable.completed = true;
+				
+				// Add object and triggers
+				this.processResultPrize(this.gameVariables.currentInteractable.result);
 
-            // Final message
-            this.processDialog(this.gameVariables.currentInteractable.completedMessages);
-        }, () => {
-            this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
-        });
+				// Final message
+				this.processDialog(this.gameVariables.currentInteractable.completedMessages);
+			}, () => {
+				this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+			});
+		} else {
+			this.processDialog(this.gameVariables.currentInteractable.doneMessages);
+		}
+
     }
 
     processTeleport() {
@@ -407,21 +418,14 @@ class InteractableManager {
         ) {
             this.gameVariables.currentInteractable.messageIndex = this.gameVariables.currentInteractable.messageIndex + 1;
         } else {
-            this.gameVariables.currentInteractable.messageIndex = 1;
+            this.gameVariables.currentInteractable.messageIndex = 0;
         }
     }
 
     incrementMessageIndexOrRespond() {
         if(!this.gameVariables.questions[this.gameVariables.currentInteractable.linked].isRespondingToQuestion) {
             // Just go with a normal message interaction
-            if (
-                this.gameVariables.currentInteractable.messageIndex !== undefined &&
-                this.gameVariables.currentInteractable.messageIndex !== null
-            ) {
-                this.gameVariables.currentInteractable.messageIndex = this.gameVariables.currentInteractable.messageIndex + 1;
-            } else {
-                this.gameVariables.currentInteractable.messageIndex = 1;
-            }
+            this.incrementMessageIndex();
         } else {
             // Respond here to question
             const questionData = this.gameVariables.questions[this.gameVariables.currentInteractable.linked];
@@ -493,8 +497,9 @@ class InteractableManager {
             if(effect !== undefined) {
                 this.gameVariables.mapsEffects[effect.map] = effect.name;
             }
-            if(point !== undefined) {
+            if(point !== undefined && results[i].pointAssigned === undefined) {
                 this.settings.points += point;
+				results[i].pointAssigned = true;
             }
         }
     }

@@ -94,6 +94,14 @@
         { "effect": { "map": 1, "name": "RAIN" } },
         { "point":  15 }
       ],
+	  "doneMessages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Abbiamo già preso la card! Andiamo da BrainFace!"
+        }
+      ],
       "notMetMessages": [
         {
           "type": "other",
