@@ -89,7 +89,29 @@
       ],
       "result": [
         { "trigger": 1 },
-        { "object": { "name": "dorothyCard", "description": "pass per accedere al minigioco dato da Dorothy!" } },
+        { "object": {
+            "name": "dorothyCard",
+            "description": "pass per accedere al minigioco dato da Dorothy!",
+            "usable": true,
+            "interactable": {
+              "type": "look",
+              "messages": [
+                {
+                  "type": "self",
+                  "name": "Madeline",
+                  "portrait": "main",
+                  "text": "Una card con la faccia di Dorothy!"
+                },
+                {
+                  "type": "self",
+                  "name": "Madeline",
+                  "portrait": "main",
+                  "text": "Uhm, proverò a farla vedere a BrainFace, vediamo che dice!"
+                }
+              ]
+            }
+          }
+        },
         { "sound":  "pickup.wav" },
         { "effect": { "map": 1, "name": "RAIN" } },
         { "point":  15 }

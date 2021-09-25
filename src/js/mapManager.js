@@ -61,6 +61,7 @@ class MapManager {
         this.spriteManager.readSprite('Question', `assets/images/ui/menu/question.png`);
         this.spriteManager.readSprite('Location', `assets/images/ui/menu/location.png`);
         this.spriteManager.readSprite('Points', `assets/images/ui/menu/point.png`);
+        this.spriteManager.readSprite('Usable', `assets/images/ui/menu/usable.png`);
 
         // Load main character
         this.spriteManager.readMainCharacter();

@@ -403,7 +403,7 @@ class beAdventurousEngine {
         }
 
         if(this.gameVariables.player.noplayer === false) {
-            // Ui - Semi opacque background
+            // Ui - Semi opaque background
             if (this.gameStatus.showInventory) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
                 ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
@@ -430,11 +430,16 @@ class beAdventurousEngine {
                         ctx.drawImage(inventorySlot.graphics, slotX, slotY);
 
                         if(obj !== undefined) {
-                            obj = this.spriteManager.getSprite(obj.name);
-                            const objX = slotX + inventorySlot.width / 2 - obj.width / 2;
-                            const objY = slotY + inventorySlot.height / 2 - obj.height / 2;
+                            const objSprite = this.spriteManager.getSprite(obj.name);
+                            const objX = slotX + inventorySlot.width / 2 - objSprite.width / 2;
+                            const objY = slotY + inventorySlot.height / 2 - objSprite.height / 2;
 
-                            ctx.drawImage(obj.graphics, objX, objY);
+                            ctx.drawImage(objSprite.graphics, objX, objY);
+
+                            if (obj.usable) {
+                                const usable = this.spriteManager.getSprite('Usable');
+                                ctx.drawImage(usable.graphics, slotX, slotY);
+                            }
                         }
                     }
                 }

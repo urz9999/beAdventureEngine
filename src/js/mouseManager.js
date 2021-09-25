@@ -185,6 +185,23 @@ class MouseManager {
                         this.gameStatus.blockMouseAction = false;
                     }
                 }
+            } else {
+                if(!this.gameStatus.doingQuestion) {
+                    // Check if the mouse is over some element of the inventory
+                    const index = this.overMenuSlot(canvasX, canvasY);
+                    if(index > -1) {
+                        let obj = this.gameVariables.inventory[index];
+                        if(obj !== undefined && obj.usable === true) {
+                            this.gameStatus.showInventory = false;
+                            this.gameVariables.currentInteractable = obj.interactable;
+                            this.gameStatus.processInteractable = true;
+                            this.gameStatus.walkingToInteractable = false;
+                            this.gameStatus.blockMouseAction = false;
+                            this.gameVariables.inventoryTooltip = null;
+                            this.interactableManager.processInteractables();
+                        }
+                    }
+                }
             }
         }
     }

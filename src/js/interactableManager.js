@@ -177,19 +177,27 @@ class InteractableManager {
     processCombine() {
 		if(this.gameVariables.currentInteractable.completed === undefined) {
 			this.processConditions(() => {
-				// Prevent other accesses to win condition
-				this.gameVariables.currentInteractable.completed = true;
-				
 				// Add object and triggers
 				this.processResultPrize(this.gameVariables.currentInteractable.result);
 
 				// Final message
-				this.processDialog(this.gameVariables.currentInteractable.completedMessages);
+				this.processDialog(this.gameVariables.currentInteractable.completedMessages, () => {
+                    // Prevent other accesses to win condition
+                    this.gameVariables.currentInteractable.completed = true;
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
 			}, () => {
-				this.processDialog(this.gameVariables.currentInteractable.notMetMessages);
+				this.processDialog(this.gameVariables.currentInteractable.notMetMessages, () => {
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
 			});
 		} else {
-			this.processDialog(this.gameVariables.currentInteractable.doneMessages);
+			this.processDialog(this.gameVariables.currentInteractable.doneMessages, () => {
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
+            });
 		}
 
     }
@@ -388,6 +396,7 @@ class InteractableManager {
             if(
                 this.gameVariables.currentInteractable.type !== 'question' &&
                 this.gameVariables.currentInteractable.type !== 'partner' &&
+                this.gameVariables.currentInteractable.type !== 'combine' &&
                 this.gameVariables.currentInteractable.type !== 'look'
             ) {
                 this.gameVariables.currentInteractable = null;
@@ -446,7 +455,7 @@ class InteractableManager {
     addToInventory() {
         // Add to inventory and remove from screen
         if(this.gameVariables.inventory.filter(obj => obj.name === this.gameVariables.currentInteractable.linked).length === 0) {
-            this.gameVariables.inventory.push({ name: this.gameVariables.currentInteractable.linked, description: this.gameVariables.currentInteractable.description });
+            this.gameVariables.inventory.push({ name: this.gameVariables.currentInteractable.linked, description: this.gameVariables.currentInteractable.description, usable: this.gameVariables.currentInteractable.usable, interactable: this.gameVariables.currentInteractable.interactable });
             this.gameVariables.interactables = this.gameVariables.interactables.filter(obj => obj.linked !== this.gameVariables.currentInteractable.linked);
             this.gameVariables.objects = this.gameVariables.objects.filter(obj => obj.name !== this.gameVariables.currentInteractable.linked);
 
@@ -481,7 +490,7 @@ class InteractableManager {
             }
             if(object !== undefined) {
                 if(this.gameVariables.inventory.filter(obj => obj.name === object.name).length === 0) {
-                    this.gameVariables.inventory.push({ name: object.name, description: object.description });
+                    this.gameVariables.inventory.push(object);
                 }
             }
             if(wingame !== undefined) {
@@ -516,7 +525,7 @@ class InteractableManager {
 
     processLook() {
         this.processDialog(this.gameVariables.currentInteractable.messages, () => {
-            if(this.processResultPrize(this.gameVariables.currentInteractable.result)) {
+            if(this.gameVariables.currentInteractable.result) {
                 this.processResultPrize(this.gameVariables.currentInteractable.result);
             }
             this.gameVariables.currentInteractable = null;
