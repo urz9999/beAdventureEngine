@@ -39,5 +39,7 @@
     }
   ],
 
+  "noAlternateWorldMessages": ["Non sembra reagire con questo luogo! Magari devo provare da un'altra parte..."],
+
   "usePointSystem": true
 }

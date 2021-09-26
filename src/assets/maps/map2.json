@@ -188,6 +188,66 @@
           "text": "Assolutamente! Perchè sono la migliore! Cioè the best of the best, insomma, farò testare il minigioco agli sviluppatori!"
         }
       ]
+    },
+        {
+      "type": "look",
+      "linked": "unicorn",
+      "x": 680,
+      "y": 300,
+      "width": 175,
+      "height": 184,
+      "result": [
+        { "object": {
+            "name": "device",
+            "description": "Dispositivo del 40.000dc per viaggiare tra le dimensioni!",
+            "usable": true,
+            "interactable": {
+              "type": "alternate",
+              "sound": "ding.wav"
+            }
+          }
+        },
+        { "sound":  "pickup.wav" },
+        { "point":  35 }
+      ],
+      "messages": [
+        {
+          "type": "other",
+          "name": "Dubbing Unicorn",
+          "portrait": "unicorn",
+          "text": "Viaggia tra le dimensioni del gusto bella!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Eh?"
+        },
+        {
+          "type": "other",
+          "name": "Dubbing Unicorn",
+          "portrait": "unicorn",
+          "text": "Oh yeah il mio potente dispositivo spaziale può farti decollare verso nuove avventure!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ok ok! E quindi?"
+        },
+        {
+          "type": "other",
+          "name": "Dubbing Unicorn",
+          "portrait": "unicorn",
+          "text": "E quindi te lo regalo! Ooooh yeahhhh!!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "..."
+        }
+      ]
     }
   ],
   "characters": [
@@ -204,6 +264,13 @@
       "frames": 4,
       "x": 450,
       "y": 270
+    },
+    {
+      "name": "unicorn",
+      "sWidth": 175,
+      "frames": 4,
+      "x": 680,
+      "y": 300
     }
   ],
   "objects": [

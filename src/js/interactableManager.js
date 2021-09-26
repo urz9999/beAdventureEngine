@@ -47,6 +47,7 @@ class InteractableManager {
                     case 'openurl': this.processOpenUrl(); break;
                     case 'teleport': this.processTeleport(); break;
                     case 'partner': this.processPartnerAndDiaog(); break;
+                    case 'alternate': this.processAlternateWorldSwitch(); break;
                     case 'exit': this.processTeleport(); break;
                 }
             } else {
@@ -75,6 +76,66 @@ class InteractableManager {
         }
     }
 
+    processAlternateWorldSwitch() {
+        if(this.gameVariables.canAlternate) {
+            if(this.gameVariables.currentInteractable.messages) {
+                this.processDialog(this.gameVariables.currentInteractable.messages, () => {
+                    // Play sound if exists
+                    if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
+                        this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
+                    }
+                    this.gameStatus.alternate = !this.gameStatus.alternate;
+                    // Change Music depending on world if needed
+                    if(this.gameStatus.alternate && this.gameVariables.alternateMusic) {
+                        this.soundSystem.playBackgroundMusic(this.gameVariables.alternateMusic);
+                    } else {
+                        this.soundSystem.playBackgroundMusic(this.gameVariables.currentMusic);
+                    }
+                    this.gameVariables.currentInteractable = null;
+                    this.gameStatus.processInteractable = false;
+                });
+            } else {
+                // Play sound if exists
+                if(this.gameVariables.currentInteractable.sound !== undefined && this.gameVariables.currentInteractable.sound !== null) {
+                    this.soundSystem.playSound(this.gameVariables.currentInteractable.sound);
+                }
+                this.gameStatus.alternate = !this.gameStatus.alternate;
+                // Change Music depending on world if needed
+                if(this.gameStatus.alternate && this.gameVariables.alternateMusic) {
+                    this.soundSystem.playBackgroundMusic(this.gameVariables.alternateMusic);
+                } else {
+                    this.soundSystem.playBackgroundMusic(this.gameVariables.currentMusic);
+                }
+                this.gameVariables.currentInteractable = null;
+                this.gameStatus.processInteractable = false;
+            }
+        } else {
+            if(!this.gameVariables.currentInteractable.messageIndex || this.gameVariables.currentInteractable.messageIndex === 0) {
+                
+                const messages = [];
+                for(let i = 0; i < this.settings.noAlternateWorldMessages.length; i++) {    
+                    messages.push({
+                        type: "self",
+                        name: "Madeline",
+                        portrait: "main",
+                        text: this.settings.noAlternateWorldMessages[i]
+                    });              
+                }
+
+                this.gameVariables.currentInteractable = {
+                    type: "dialog",
+                    linked: "main",
+                    width: this.gameVariables.currentInteractable.width,
+                    height: this.gameVariables.currentInteractable.height,
+                    x: this.gameVariables.currentInteractable.x,
+                    y: this.gameVariables.currentInteractable.y,
+                    messages: messages
+                };
+            }
+            this.processDialog(this.gameVariables.currentInteractable.messages);
+        }
+    }
+
     processDeniedPartner() {
         if(!this.gameVariables.currentInteractable.messageIndex || this.gameVariables.currentInteractable.messageIndex === 0) {
             const partner = this.settings.partners[this.gameStatus.partnerIndex - 1];
@@ -96,7 +157,10 @@ class InteractableManager {
                 ]
             };
         }
-        this.processDialog(this.gameVariables.currentInteractable.messages);
+        this.processDialog(this.gameVariables.currentInteractable.messages, () => {
+             this.gameVariables.currentInteractable = null;
+             this.gameStatus.processInteractable = false;
+        });
     }
 
     processPartnerAndDiaog() {
@@ -397,6 +461,7 @@ class InteractableManager {
                 this.gameVariables.currentInteractable.type !== 'question' &&
                 this.gameVariables.currentInteractable.type !== 'partner' &&
                 this.gameVariables.currentInteractable.type !== 'combine' &&
+                this.gameVariables.currentInteractable.type !== 'alternate' &&
                 this.gameVariables.currentInteractable.type !== 'look'
             ) {
                 this.gameVariables.currentInteractable = null;

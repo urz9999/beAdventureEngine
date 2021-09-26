@@ -55,7 +55,9 @@ class beAdventurousEngine {
             originalWidth: 0,
             originalHeight: 0,
 
-            partnerIndex: 0
+            partnerIndex: 0,
+
+            alternate: false,
         };
 
         this.gameVariables = {
@@ -69,8 +71,10 @@ class beAdventurousEngine {
             staticTexts: {},
             minigames: {},
             interactableAuraOn: null,
+            canAlternate: false,
             currentMap: 0,
             currentMusic: '',
+            alternateMusic: '',
             isMapBiggerThanCanvas: false,
             currentInteractable: null,
             currentDialog: null,
@@ -228,23 +232,32 @@ class beAdventurousEngine {
         }
 
         // Backgrounds
-        const bgR = this.spriteManager.getSprite('BG_R');
-        const bgM = this.spriteManager.getSprite('BG_M');
-        ctx.drawImage(bgR.graphics, bgR.getCoords().x, bgR.getCoords().y + this.mapManager.map.bg_R_offset, bgR.width, bgR.height);
-        ctx.drawImage(bgM.graphics, bgM.getCoords().x, bgM.getCoords().y + this.mapManager.map.bg_M_offset, bgM.width, bgM.height);
+        const bgR = !this.gameStatus.alternate ? this.spriteManager.getSprite('BG_R'): this.spriteManager.getSprite('BG_R_A');
+        const bgM = !this.gameStatus.alternate ? this.spriteManager.getSprite('BG_M'): this.spriteManager.getSprite('BG_M_A');
+        const bgR_Offset = !this.gameStatus.alternate ? this.mapManager.map.bg_R_offset : this.mapManager.map.bg_R_A_offset;
+        const bgM_Offset = !this.gameStatus.alternate ? this.mapManager.map.bg_M_offset : this.mapManager.map.bg_M_A_offset;
+
+        ctx.drawImage(bgR.graphics, bgR.getCoords().x, bgR.getCoords().y + bgR_Offset, bgR.width, bgR.height);
+        ctx.drawImage(bgM.graphics, bgM.getCoords().x, bgM.getCoords().y + bgM_Offset, bgM.width, bgM.height);
 
         // Characters
         for(let i = 0; i < this.gameVariables.characters.length; i++) {
             const name = this.gameVariables.characters[i].name;
             const char = this.spriteManager.getSprite(name);
-            if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) {
 
+            if(
+                (this.gameVariables.characters[i].alternate === true && this.gameStatus.alternate === true) ||
+                (this.gameVariables.characters[i].alternate === undefined && this.gameStatus.alternate === false)
+            ) {
+                if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) {}
+
+                ctx.drawImage(
+                    char.graphics,
+                    char.subSprite.sx, char.subSprite.sy, char.subSprite.width, char.subSprite.height,
+                    char.subSprite.dx, char.subSprite.dy, char.subSprite.width, char.subSprite.height
+                );
             }
-            ctx.drawImage(
-                char.graphics,
-                char.subSprite.sx, char.subSprite.sy, char.subSprite.width, char.subSprite.height,
-                char.subSprite.dx, char.subSprite.dy, char.subSprite.width, char.subSprite.height
-            );
+
         }
 
         // Objects
@@ -253,17 +266,22 @@ class beAdventurousEngine {
             const obj = this.spriteManager.getSprite(name);
             const objON = this.spriteManager.getSprite(`${name}ON`);
 
-            if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) { /* TODO: try a way to show aura only on object */ }
+            if(
+                (this.gameVariables.objects[i].alternate === true && this.gameStatus.alternate === true) ||
+                (this.gameVariables.objects[i].alternate === undefined && this.gameStatus.alternate === false)
+            ) {
+                if(this.gameVariables.interactableAuraOn !== null && this.gameVariables.interactableAuraOn === name) { /* TODO: try a way to show aura only on object */ }
 
-            const trigger = this.gameVariables.triggers[name];
-            if(trigger !== undefined) {
-                if(trigger === 0 || objON === undefined) {
-                    ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
+                const trigger = this.gameVariables.triggers[name];
+                if(trigger !== undefined) {
+                    if(trigger === 0 || objON === undefined) {
+                        ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
+                    } else {
+                        ctx.drawImage(objON.graphics, obj.getCoords().x, obj.getCoords().y, objON.width, objON.height);
+                    }
                 } else {
-                    ctx.drawImage(objON.graphics, obj.getCoords().x, obj.getCoords().y, objON.width, objON.height);
+                    ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
                 }
-            } else {
-                ctx.drawImage(obj.graphics, obj.getCoords().x, obj.getCoords().y, obj.width, obj.height);
             }
         }
 
@@ -306,8 +324,9 @@ class beAdventurousEngine {
         }
 
         // Foreground
-        const bgF = this.spriteManager.getSprite('BG_F');
-        ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + this.mapManager.map.bg_F_offset, bgF.width, bgF.height);
+        const bgF = !this.gameStatus.alternate ? this.spriteManager.getSprite('BG_F') : this.spriteManager.getSprite('BG_F_A');
+        const bgF_Offset = !this.gameStatus.alternate ? this.mapManager.map.bg_F_offset : this.mapManager.map.bg_F_A_offset;
+        ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + bgF_Offset, bgF.width, bgF.height);
 
         // Before painting UI restore the context
         ctx.restore();

@@ -214,6 +214,7 @@ class MouseManager {
             'look': `url('assets/images/ui/menu/cursors/look.cur'), auto`,
             'take': `url('assets/images/ui/menu/cursors/take.cur'), auto`,
             'talk': `url('assets/images/ui/menu/cursors/talk.cur'), auto`,
+            'alternate': `url('assets/images/ui/menu/cursors/talk.cur'), auto`,
             'combine': `url('assets/images/ui/menu/cursors/combine.cur'), auto`,
             'teleport': `url('assets/images/ui/menu/cursors/standard.cur'), auto`,
             'exit': `url('assets/images/ui/menu/cursors/exit.cur'), auto`
@@ -271,7 +272,9 @@ class MouseManager {
                 translatedX > interactable.x && translatedX < (interactable.x + interactable.width) &&
                 canvasY > interactable.y && canvasY < (interactable.y + interactable.height)
             ) {
-                return interactable;
+                if(this.gameStatus.alternate === true && interactable.alternate === true) { return interactable; }
+                else if(!this.gameStatus.alternate && interactable.alternate === undefined) { return interactable; }
+                else return null;
             }
         }
         return null;

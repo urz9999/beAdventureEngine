@@ -32,6 +32,8 @@ class Settings {
     // Partner System
     partners = [];
 
+    noAlternateWorldMessages;
+
     // Point System
     points;
     usePointSystem;
@@ -81,6 +83,9 @@ class Settings {
 
         // Partners configuration
         this.partners = settings.partners
+
+        // Alternate World Deny Messages
+        this.noAlternateWorldMessages = settings.noAlternateWorldMessages;
 
         // Configuration for point system
         this.points = 0;

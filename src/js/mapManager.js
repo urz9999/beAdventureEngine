@@ -41,6 +41,8 @@ class MapManager {
         this.gameVariables.mapName = map.name;
         this.gameVariables.currentMap = number;
         this.gameVariables.currentMusic = map.startingMusic;
+        this.gameVariables.alternateMusic = map.alternateMusic;
+        this.gameVariables.canAlternate = (map.canAlternate === true);
 
         // Load loader
         this.spriteManager.readAnimatedCharacter('Loading', `assets/images/ui/menu/loading.png`, 400, 50);
@@ -49,6 +51,16 @@ class MapManager {
         this.spriteManager.readSprite('BG_R', `assets/images/maps/map${number}/map${number}_R.png`);
         this.spriteManager.readSprite('BG_M', `assets/images/maps/map${number}/map${number}_M.png`);
         this.spriteManager.readSprite('BG_F', `assets/images/maps/map${number}/map${number}_F.png`);
+        // Load alternate world background if present
+        if(this.spriteManager.imageExists(`/assets/images/maps/map${number}/map${number}_R_A.png`)) {
+            this.spriteManager.readSprite('BG_R_A', `assets/images/maps/map${number}/map${number}_R_A.png`);
+        }
+        if(this.spriteManager.imageExists(`/assets/images/maps/map${number}/map${number}_M_A.png`)) {
+            this.spriteManager.readSprite('BG_M_A', `assets/images/maps/map${number}/map${number}_M_A.png`);
+        }
+        if(this.spriteManager.imageExists(`/assets/images/maps/map${number}/map${number}_F_A.png`)) {
+            this.spriteManager.readSprite('BG_F_A', `assets/images/maps/map${number}/map${number}_F_A.png`);
+        }
 
         // Load UI
         this.spriteManager.readSprite('PlayIcon', `assets/images/ui/menu/play.png`);
@@ -103,6 +115,15 @@ class MapManager {
         const combines = map.interactables.filter(int => int.type === 'combine');
         for(let i = 0; i < combines.length; i++) {
             const objects = combines[i].result.filter(r => r.object !== undefined);
+            for(let j = 0; j < objects.length; j++) {
+                this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
+            }
+        }
+
+        // Load prize for look
+        const looks = map.interactables.filter(int => int.type === 'look');
+        for(let i = 0; i < looks.length; i++) {
+            const objects = looks[i].result.filter(r => r.object !== undefined);
             for(let j = 0; j < objects.length; j++) {
                 this.spriteManager.readSprite(objects[j].object.name, `assets/images/ui/objects/${objects[j].object.name}.png`);
             }

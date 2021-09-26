@@ -354,6 +354,153 @@
           "text": "Quindi posso fare così: ${lever}!"
         }
       ]
+    },
+    {
+      "type": "dialog",
+      "linked": "incubus1",
+      "alternate": true,
+      "width": 43,
+      "height": 75,
+      "x": 1300,
+      "y": 203,
+      "messages": [
+        {
+          "type": "other",
+          "name": "Oni Incubus Numero 1",
+          "portrait": "incubus1",
+          "text": "Muoriii! Muoriiii! Umanoooo! Il tuo sangue..."
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Che essere poco fascinoso, non mi sconfinferi per niente!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Dove sono finita? Parla essere deforme e puzzolente!"
+        },
+                {
+          "type": "other",
+          "name": "Oni Incubus Numero 1",
+          "portrait": "incubus1",
+          "text": "Il tuo sangue! Fammi succhiare le tue interiora...tenere ossa del collo!"
+        },
+                {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "...Cambiamo aria..."
+        }
+      ]
+    },
+    {
+      "type": "dialog",
+      "linked": "incubus2",
+      "alternate": true,
+      "width": 57,
+      "height": 104,
+      "x": 700,
+      "y": 203,
+      "messages": [
+        {
+          "type": "other",
+          "name": "Oni Incubus Numero 2",
+          "portrait": "incubus2",
+          "text": "Non puoi più fuggire...Ti succhieremo tutta! Tuttaaaa! Sluuuurp!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Ma succhiati 'sta cippa! Chittemuort!"
+        },
+        {
+          "type": "other",
+          "name": "Oni Incubus Numero 2",
+          "portrait": "incubus2",
+          "text": "Sluuuuurp! Sluuuurp! Aaaahhh! Uahahahahahahah!"
+        },
+                {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "...Pessimo..."
+        }
+      ]
+    },
+    {
+      "type": "dialog",
+      "linked": "incubus4",
+      "alternate": true,
+      "width": 57,
+      "height": 75,
+      "x": 300,
+      "y": 203,
+      "messages": [
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Un altro mostro? Che bruttezza indicibile, mi si è fermata la crescita dei peli! Che Ovvvove!"
+        },
+        {
+          "type": "other",
+          "name": "Oni Incubus Numero 3",
+          "portrait": "incubus4",
+          "text": "Uahahahahahahah! Noi esistiamo negli incubi degli esseri umani! E anche delle Galline! Siamo invincibiliiiiii!"
+        },
+                {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "...Se se...polletto vallespluga!"
+        }
+      ]
+    },
+    {
+      "type": "alternate",
+      "linked": "drKetta",
+      "width": 56,
+      "height": 38,
+      "x": 1600,
+      "y": 203,
+      "messages": [
+        {
+          "type": "other",
+          "name": "Dr. Ketta",
+          "portrait": "drKetta",
+          "text": "Oh! Miao! Sei stata teleporGatta anche tu in questo MIAondo?"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Si! ciao Gatto Parlante...e Puccioso!"
+        },
+        {
+          "type": "other",
+          "name": "Dr. Ketta",
+          "portrait": "drKetta",
+          "text": "Miao! Miao! Posso riporGnarti indietro se lo vuoi! Miao!"
+        },
+        {
+          "type": "self",
+          "name": "Madeline",
+          "portrait": "main",
+          "text": "Sul serio? Proviamo!"
+        },
+        {
+          "type": "other",
+          "name": "Dr. Ketta",
+          "portrait": "drKetta",
+          "text": "SubiGniao! Missili GattoTermici che aproGno il cancello felino dimenGNiaonale! Miao, miao, ci vediamo!"
+        }
+      ],
+      "sound": "ding.wav",
+      "alternate": true
     }
   ],
   "characters": [
@@ -391,6 +538,38 @@
       "frames": 8,
       "x": 1600,
       "y": 203
+    },
+    {
+      "name": "incubus1",
+      "alternate": true,
+      "sWidth": 43,
+      "frames": 4,
+      "x": 1300,
+      "y": 203
+    },
+    {
+      "name": "incubus2",
+      "alternate": true,
+      "sWidth": 57,
+      "frames": 4,
+      "x": 700,
+      "y": 203
+    },
+    {
+      "name": "incubus4",
+      "alternate": true,
+      "sWidth": 128,
+      "frames": 4,
+      "x": 300,
+      "y": 203
+    },
+    {
+      "name": "drKetta",
+      "alternate": true,
+      "sWidth": 56,
+      "frames": 4,
+      "x": 1600,
+      "y": 203
     }
   ],
   "objects": [
@@ -419,7 +598,12 @@
   "bg_R_offset": -250,
   "bg_M_offset": 70,
   "bg_F_offset": 200,
+  "bg_R_A_offset": -250,
+  "bg_M_A_offset": 70,
+  "bg_F_A_offset": 200,
   "startingPoint": [1500, 350],
   "startingMusic": "8-Bit-Perplexion.mp3",
-  "walkableOffset": 0
+  "alternateMusic": "darkness.mp3",
+  "walkableOffset": 0,
+  "canAlternate": true
 }
