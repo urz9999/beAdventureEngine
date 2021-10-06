@@ -138,6 +138,11 @@ class MapManager {
             }
         }
 
+        // Load transition
+        if(this.settings.worldTransition) {
+            this.spriteManager.readAnimatedCharacter('transition', 'assets/images/ui/menu/transition.png', this.settings.worldTransitionSWidth, this.settings.worldTransitionFrames);
+        }
+
         // Set game variables to map data
         this.gameVariables.objects = this.filterObjectsFromInventory(map.objects);
         this.gameVariables.characters = map.characters;
@@ -201,6 +206,11 @@ class MapManager {
                 bgM.x = bgM.x + initialOffsetX;
                 const bgF = this.spriteManager.getSprite('BG_F');
                 bgF.x = bgF.x + initialOffsetX;
+
+                // Set transition position
+                if(this.settings.worldTransition) {
+                    this.spriteManager.getSprite('transition').setCoords(0, 0);
+                }
 
                 // ==== Set status to map and start level
                 this.gameStatus.levelStatus = 1;

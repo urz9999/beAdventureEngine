@@ -33,6 +33,7 @@ class Settings {
     partners = [];
 
     noAlternateWorldMessages;
+    worldTransition;
 
     // Point System
     points;
@@ -86,6 +87,11 @@ class Settings {
 
         // Alternate World Deny Messages
         this.noAlternateWorldMessages = settings.noAlternateWorldMessages;
+        this.worldTransition = settings.worldTransition;
+        this.worldTransitionSWidth = settings.worldTransitionSWidth;
+        this.worldTransitionFrames = settings.worldTransitionFrames;
+        this.worldTransitionSpeed = settings.worldTransitionSpeed;
+        this.worldTransitionDone = false;
 
         // Configuration for point system
         this.points = 0;

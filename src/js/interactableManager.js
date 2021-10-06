@@ -93,6 +93,7 @@ class InteractableManager {
                     }
                     this.gameVariables.currentInteractable = null;
                     this.gameStatus.processInteractable = false;
+                    this.settings.worldTransitionDone = false;
                 });
             } else {
                 // Play sound if exists
@@ -108,6 +109,7 @@ class InteractableManager {
                 }
                 this.gameVariables.currentInteractable = null;
                 this.gameStatus.processInteractable = false;
+                this.settings.worldTransitionDone = false;
             }
         } else {
             if(!this.gameVariables.currentInteractable.messageIndex || this.gameVariables.currentInteractable.messageIndex === 0) {

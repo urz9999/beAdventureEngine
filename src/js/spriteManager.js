@@ -221,4 +221,8 @@ class AnimatedSprite extends Sprite {
     getFrame() {
         return this.subSprite;
     }
+
+    isEnded() {
+        return this.currentFrame === this.frames - 1;
+    }
 }

@@ -328,6 +328,18 @@ class beAdventurousEngine {
         const bgF_Offset = !this.gameStatus.alternate ? this.mapManager.map.bg_F_offset : this.mapManager.map.bg_F_A_offset;
         ctx.drawImage(bgF.graphics, bgF.getCoords().x, bgF.getCoords().y + bgF_Offset, bgF.width, bgF.height);
 
+        // World Transition Effect if present
+        if(this.settings.worldTransition && !this.settings.worldTransitionDone) {     
+            const transition = this.spriteManager.getSprite('transition');
+            ctx.globalCompositeOperation = "multiply";
+            ctx.scale(this.gameCanvas.width/transition.subSprite.width, this.gameCanvas.width/transition.subSprite.width);
+            ctx.drawImage(
+                transition.graphics,
+                transition.subSprite.sx, transition.subSprite.sy, transition.subSprite.width, transition.subSprite.height,
+                transition.subSprite.dx, transition.subSprite.dy, transition.subSprite.width, transition.subSprite.height
+            );
+        }
+
         // Before painting UI restore the context
         ctx.restore();
 
@@ -550,6 +562,18 @@ class beAdventurousEngine {
             const name = this.gameVariables.characters[i].name;
             const char = this.spriteManager.getSprite(name);
             char.animate();
+        }
+
+        // Transition Animation
+        if(this.settings.worldTransition && !this.settings.worldTransitionDone) {
+            const transition = this.spriteManager.getSprite('transition');
+            for(let i = 0; i < (this.settings.worldTransitionSpeed || 1); i++) {
+                transition.animate();
+                if(transition.isEnded()) {
+                    this.settings.worldTransitionDone = true;
+                    transition.currentFrame = 0;
+                }
+            }
         }
 
         // Player & partners animations

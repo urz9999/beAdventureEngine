@@ -40,6 +40,10 @@
   ],
 
   "noAlternateWorldMessages": ["Non sembra reagire con questo luogo! Magari devo provare da un'altra parte..."],
+  "worldTransition": "transition.png",
+  "worldTransitionSWidth": 500,
+  "worldTransitionFrames": 109,
+  "worldTransitionSpeed": 10,
 
   "usePointSystem": true
 }
