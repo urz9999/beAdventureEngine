@@ -1,8 +1,8 @@
 import type { GameStatus, GameVariables } from '../types';
-import type { Settings } from './settings.js';
-import type { SoundSystem } from './soundsSystem.js';
-import type { SpriteManager } from './spriteManager.js';
-import type { FontManager } from './fontManager.js';
+import type { Settings } from './settings';
+import type { SoundSystem } from './soundsSystem';
+import type { SpriteManager } from './spriteManager';
+import type { FontManager } from './fontManager';
 
 export class MiniGame {
   protected gameCanvas: HTMLCanvasElement;

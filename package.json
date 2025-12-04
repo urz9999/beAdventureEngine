@@ -4,12 +4,13 @@
   "description": "beAdventure Engine - TypeScript Point & Click Adventure Game Engine",
   "type": "module",
   "scripts": {
-    "build": "npm run compile && npm run compile:scss && npm run copy:assets",
+    "build": "npm run clean && npm run bundle && npm run compile:scss && npm run copy:assets",
     "serve": "http-server dist -p 8080 -o -c-1",
     "start": "npm run build && npm run serve",
-    "compile": "tsc",
+    "bundle": "node esbuild.config.js",
     "compile:scss": "sass src/css/style.scss dist/css/style.css",
     "copy:assets": "mkdir -p dist && cp -r src/assets dist/ && cp src/index.html dist/index.html",
+    "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -24,6 +25,7 @@
   "packageManager": "pnpm@9.0.0",
   "devDependencies": {
     "@types/node": "22.10.1",
+    "esbuild": "^0.27.0",
     "http-server": "14.1.1",
     "sass": "1.81.0",
     "typescript": "5.7.2",

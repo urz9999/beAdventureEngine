@@ -1,5 +1,5 @@
 import type { GameVariables, FontStyle } from '../types';
-import type { Settings } from './settings.js';
+import type { Settings } from './settings';
 
 export class FontManager {
   private fontList: Record<string, FontStyle> = {};

@@ -1,6 +1,6 @@
 import type { GameStatus, GameVariables } from '../types';
-import type { Settings } from './settings.js';
-import type { MathHelper } from './mathHelper.js';
+import type { Settings } from './settings';
+import type { MathHelper } from './mathHelper';
 
 interface Drop {
   x: number;

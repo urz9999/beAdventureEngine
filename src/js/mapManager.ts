@@ -1,6 +1,6 @@
 import type { GameStatus, GameVariables, SettingsData, MapData, GameObject, Interactable } from '../types';
-import type { SpriteManager } from './spriteManager.js';
-import type { SoundSystem } from './soundsSystem.js';
+import type { SpriteManager } from './spriteManager';
+import type { SoundSystem } from './soundsSystem';
 
 export class MapManager {
   map: MapData;

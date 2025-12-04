@@ -1,5 +1,5 @@
-import { FalloutMinigame } from './assets/minigames/fallout-minigame/falloutMinigame.js';
-import { beAdventurousEngine } from './js/engine.js';
+import { FalloutMinigame } from './assets/minigames/fallout-minigame/falloutMinigame';
+import { beAdventurousEngine } from './js/engine';
 
 // Initialize the game when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

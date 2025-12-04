@@ -1,6 +1,6 @@
 import type { GameStatus, GameVariables, SettingsData, Interactable } from '../types';
-import type { AnimatedSprite, MainSprite, SpriteManager } from './spriteManager.js';
-import type { InteractableManager } from './interactableManager.js';
+import type { AnimatedSprite, MainSprite, SpriteManager } from './spriteManager';
+import type { InteractableManager } from './interactableManager';
 
 export class MouseManager {
   private gameCanvas: HTMLCanvasElement;

@@ -1,7 +1,7 @@
 import type { GameStatus, GameVariables, SettingsData, Dialog, Interactable } from '../types';
-import type { SoundSystem } from './soundsSystem.js';
-import type { SpriteManager } from './spriteManager.js';
-import type { MapManager } from './mapManager.js';
+import type { SoundSystem } from './soundsSystem';
+import type { SpriteManager } from './spriteManager';
+import type { MapManager } from './mapManager';
 
 export class InteractableManager {
   private gameCanvas: HTMLCanvasElement;

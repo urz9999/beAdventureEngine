@@ -1,4 +1,4 @@
-import { MiniGame } from '../../../js/minigame.js';
+import { MiniGame } from '../../../js/minigame';
 import type { GameStatus, GameVariables } from '../../../types';
 import type { Settings } from '../../../js/settings';
 import type { SoundSystem } from '../../../js/soundsSystem';
@@ -120,9 +120,12 @@ export class FalloutMinigame extends MiniGame {
   private UpdateAttempts(): void {
     let AttemptString = `${this.AttemptsRemaining} ATTEMPT(S) LEFT: `;
     this.JTypeFill("attempts", AttemptString, 20, () => {
+      const attemptsElement = document.getElementById("attempts");
+      if (!attemptsElement) return; // Element was removed, minigame ended
+      
       let i = 0;
       while (i < this.AttemptsRemaining) { AttemptString += " &#9608;"; i++; }
-      document.getElementById("attempts")!.innerHTML = AttemptString;
+      attemptsElement.innerHTML = AttemptString;
     }, "", "");
   }
 
@@ -168,7 +171,9 @@ export class FalloutMinigame extends MiniGame {
   }
 
   private JTypeFill(containerID: string, text: string, TypeSpeed: number, callback: () => void, TypeCharacter: string, Prefix: string): void {
-    const cont = document.getElementById(containerID)!;
+    const cont = document.getElementById(containerID);
+    if (!cont) return; // Element doesn't exist, minigame may have ended
+    
     TypeCharacter = TypeCharacter || "&#9608;";
     Prefix = Prefix || ">";
 
@@ -179,14 +184,21 @@ export class FalloutMinigame extends MiniGame {
       {
         duration: TypeSpeed * text.length,
         step: (i: number) => {
+          const contElement = document.getElementById(containerID);
+          if (!contElement) return; // Check again during animation
+          
           let insert = Prefix + text.substr(0, i);
 
-          if ($(cont).text().substr(0, $(cont).text().length - 1) !== insert) {
+          if ($(contElement).text().substr(0, $(contElement).text().length - 1) !== insert) {
             this.soundSystem.playSoundByPath(`${this.soundPath}k${this.getSoundNumber()}.ogg`);
           }
-          cont.innerHTML = insert + TypeCharacter;
+          contElement.innerHTML = insert + TypeCharacter;
         },
-        complete: callback
+        complete: () => {
+          if (document.getElementById(containerID)) {
+            callback();
+          }
+        }
       }
     );
   }

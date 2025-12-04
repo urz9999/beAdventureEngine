@@ -1,13 +1,13 @@
 import type { GameStatus, GameVariables } from '../types';
-import { Settings } from './settings.js';
-import { SoundSystem } from './soundsSystem.js';
-import { SpriteManager } from './spriteManager.js';
-import { FontManager } from './fontManager.js';
-import { MapManager } from './mapManager.js';
-import { InteractableManager } from './interactableManager.js';
-import { MouseManager } from './mouseManager.js';
-import { MathHelper } from './mathHelper.js';
-import { EffectManager } from './effectManager.js';
+import { Settings } from './settings';
+import { SoundSystem } from './soundsSystem';
+import { SpriteManager } from './spriteManager';
+import { FontManager } from './fontManager';
+import { MapManager } from './mapManager';
+import { InteractableManager } from './interactableManager';
+import { MouseManager } from './mouseManager';
+import { MathHelper } from './mathHelper';
+import { EffectManager } from './effectManager';
 
 export class beAdventurousEngine {
   private gameCanvas: HTMLCanvasElement;
